@@ -1,0 +1,37 @@
+// Test all Midori features
+
+fn greet(name: Str) -> Str {
+    if name == "world" {
+        "Hello, world!"
+    } elif name == "Midori" {
+        "Hello, Midori!"
+    } else {
+        "Hi, " + name
+    }
+}
+
+fn fib(n: Int) -> Int {
+    if n <= 1 {
+        n
+    } else {
+        fib(n - 1) + fib(n - 2)
+    }
+}
+
+fn main() {
+    // Print with both names
+    print("=== Midori Tests ===")
+    
+    // String operations
+    let msg: Str = greet("Midori")
+    println(msg)
+    
+    // Fibonacci (recursion, arithmetic)
+    let result: Int = fib(20)
+    let s: Str = str(result)
+    println(s)
+    
+    // String + string concatenation
+    let combined: Str = "Hello, " + "world!"
+    println(combined)
+}

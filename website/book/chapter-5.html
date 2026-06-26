@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 5 — Types | The Midori Programming Language</title>
+    <link rel="stylesheet" href="../styles/midori.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <a href="../" class="logo">
+            <svg class="logo-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="leaf" d="M16 4C12 4 6 8 6 16C6 24 10 28 16 28C18 28 20 27 22 25C20 24 18 22 17 19C16 16 17 12 20 9C22 7 24 5 26 4C24 3 20 2 16 4Z"/>
+                <path class="leaf-accent" d="M16 28C14 28 10 26 9 22C11 23 14 23 16 21C18 19 19 15 20 12C21 10 22 8 24 7C22 9 20 12 19 16C18 20 17 24 16 28Z"/>
+            </svg>
+            <span>midori</span>
+        </a>
+        <div class="nav-links">
+            <a href="../docs/">Docs</a>
+            <a href="../book/">Book</a>
+            <a href="https://github.com/midori-lang/midori">GitHub</a>
+        </div>
+    </nav>
+
+    <div class="content">
+        <h1>Chapter 5: Types</h1>
+
+        <h2>Primitive Types</h2>
+        <p>Midori provides a set of built-in primitive types that form the foundation of all programs. These types are deeply integrated into the compiler and have special syntax for their literals.</p>
+
+        <ul>
+            <li><code>Int</code> &mdash; Signed integer, platform-sized (64-bit on most systems).</li>
+            <li><code>Float</code> &mdash; Double-precision IEEE 754 floating point.</li>
+            <li><code>Bool</code> &mdash; Boolean values <code>true</code> and <code>false</code>.</li>
+            <li><code>Str</code> &mdash; UTF-8 encoded string with interpolation support.</li>
+            <li><code>Char</code> &mdash; A single Unicode code point.</li>
+            <li><code>Unit</code> &mdash; The void type, used for functions that return nothing.</li>
+        </ul>
+
+        <pre><code><span class="kw">let</span> age:    <span class="tp">Int</span>   = <span class="num">25</span>
+<span class="kw">let</span> pi:     <span class="tp">Float</span> = <span class="num">3.14159</span>
+<span class="kw">let</span> active: <span class="tp">Bool</span>  = <span class="tp">true</span>
+<span class="kw">let</span> name:   <span class="tp">Str</span>   = <span class="str">"Midori"</span>
+<span class="kw">let</span> grade:  <span class="tp">Char</span>  = <span class="str">'A'</span></code></pre>
+
+        <h2>Type Annotations</h2>
+        <p>While Midori infers types in most cases, you can add explicit type annotations with a colon after the variable name. Annotations are useful for documentation, enforcing interfaces, or disambiguating when inference is ambiguous.</p>
+
+        <pre><code><span class="kw">fn</span> <span class="fn">add</span>(a: <span class="tp">Int</span>, b: <span class="tp">Int</span>) -> <span class="tp">Int</span> {
+    a <span class="op">+</span> b
+}
+
+<span class="kw">let</span> result: <span class="tp">Int</span> = <span class="fn">add</span>(<span class="num">3</span>, <span class="num">4</span>)</code></pre>
+
+        <h2>Type Inference in Action</h2>
+        <p>The type inference engine works across function boundaries and through complex expressions. It uses Hindley-Milner-style inference, the same algorithm that powers languages like Haskell and OCaml. This means you almost never need to write types, yet every expression is fully checked at compile time.</p>
+
+        <pre><code><span class="cm">// No type annotations needed — everything is inferred</span>
+<span class="kw">fn</span> <span class="fn">square</span>(x) { x <span class="op">*</span> x }
+
+<span class="kw">fn</span> <span class="fn">main</span>() {
+    <span class="kw">let</span> n = <span class="fn">square</span>(<span class="num">5</span>)     <span class="cm">// n is Int</span>
+    <span class="kw">let</span> f = <span class="fn">square</span>(<span class="num">2.5</span>)   <span class="cm">// f is Float</span>
+    <span class="fn">println</span>(n <span class="op">+</span> f)
+}</code></pre>
+
+        <h2>Custom Types</h2>
+        <p>Beyond primitives, Midori lets you define your own types using <code>struct</code> and <code>enum</code>. These are covered in depth in Chapter 8, but here is a quick preview:</p>
+
+        <pre><code><span class="kw">struct</span> <span class="tp">User</span> {
+    name: <span class="tp">Str</span>,
+    age:  <span class="tp">Int</span>,
+}
+
+<span class="kw">enum</span> <span class="tp">Color</span> {
+    Red,
+    Green,
+    Blue,
+    Rgb(<span class="tp">Int</span>, <span class="tp">Int</span>, <span class="tp">Int</span>),
+}</code></pre>
+
+        <h2>Type Aliases</h2>
+        <p>You can create type aliases with the <code>type</code> keyword to give descriptive names to existing types or simplify complex generic signatures.</p>
+
+        <pre><code><span class="kw">type</span> <span class="tp">UserId</span> = <span class="tp">Int</span>
+<span class="kw">type</span> <span class="tp">Callback</span>&lt;<span class="tp">T</span>&gt; = <span class="kw">fn</span>(<span class="tp">T</span>) -> <span class="tp">Unit</span>
+
+<span class="kw">fn</span> <span class="fn">lookup</span>(id: <span class="tp">UserId</span>) -> <span class="tp">Option</span>&lt;<span class="tp">User</span>&gt; {
+    <span class="cm">// ...</span>
+}</code></pre>
+
+        <div class="book-nav">
+            <a href="chapter-4.html">&larr; Previous: Variables and Bindings</a>
+            <a href="chapter-6.html" class="next">Next: Functions &rarr;</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>Midori is free and open source. <a href="https://github.com/midori-lang/midori">Contributions welcome</a>.</p>
+        <p style="margin-top:0.5rem; font-size:0.8rem;">&copy; 2026 The Midori Contributors</p>
+    </footer>
+</body>
+</html>

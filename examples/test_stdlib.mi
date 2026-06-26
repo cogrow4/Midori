@@ -1,0 +1,53 @@
+// Midori — Standard library and extended features test
+
+fn main() {
+    print("=== Stdlib & Extended Features ")
+    println("===")
+    
+    // Math library
+    print("Math: pi=")
+    let p: Float = pi()
+    println(str_float(p))
+    
+    let s: Float = sin(p / 2.0)
+    print("sin(pi/2): ")
+    println(str_float(s))
+    
+    let r: Float = sqrt(16.0)
+    print("sqrt(16): ")
+    println(str_float(r))
+    
+    let p2: Float = pow(2.0, 10.0)
+    print("pow(2,10): ")
+    println(str_float(p2))
+    
+    // Tuples
+    print("Tuple: ")
+    let t = (1, "hello")
+    let first: Int = t.f0
+    println(str(first))
+    
+    let second: Str = t.f1
+    println(second)
+    
+    // File I/O
+    print("File I/O: ")
+    let path: Str = "/tmp/midori_test.txt"
+    let ok: Bool = write_file(path, "Midori was here")
+    if ok {
+        let content: Str = read_file(path)
+        println(content)
+    } else {
+        println("write failed")
+    }
+    
+    // Bool to string
+    print("Bool: ")
+    println(str_bool(true))
+    
+    // Float to string
+    print("Float: ")
+    println(str_float(3.14))
+    
+    println("=== Done ===")
+}

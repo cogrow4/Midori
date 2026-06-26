@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 8 — Structs and Enums | The Midori Programming Language</title>
+    <link rel="stylesheet" href="../styles/midori.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <a href="../" class="logo">
+            <svg class="logo-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="leaf" d="M16 4C12 4 6 8 6 16C6 24 10 28 16 28C18 28 20 27 22 25C20 24 18 22 17 19C16 16 17 12 20 9C22 7 24 5 26 4C24 3 20 2 16 4Z"/>
+                <path class="leaf-accent" d="M16 28C14 28 10 26 9 22C11 23 14 23 16 21C18 19 19 15 20 12C21 10 22 8 24 7C22 9 20 12 19 16C18 20 17 24 16 28Z"/>
+            </svg>
+            <span>midori</span>
+        </a>
+        <div class="nav-links">
+            <a href="../docs/">Docs</a>
+            <a href="../book/">Book</a>
+            <a href="https://github.com/midori-lang/midori">GitHub</a>
+        </div>
+    </nav>
+
+    <div class="content">
+        <h1>Chapter 8: Structs and Enums</h1>
+
+        <h2>Structs</h2>
+        <p>Structs let you group related data together into a named type. Each field has a name and a type. Structs are defined with the <code>struct</code> keyword and created with named field syntax. Fields are accessed with dot notation.</p>
+
+        <pre><code><span class="kw">struct</span> <span class="tp">User</span> {
+    name: <span class="tp">Str</span>,
+    email: <span class="tp">Str</span>,
+    age: <span class="tp">Int</span>,
+}
+
+<span class="kw">let</span> user = <span class="tp">User</span> {
+    name: <span class="str">"Alice"</span>,
+    email: <span class="str">"alice@example.com"</span>,
+    age: <span class="num">30</span>,
+}
+
+<span class="fn">println</span>(user.name)  <span class="cm">// "Alice"</span></code></pre>
+
+        <h2>Tuple Structs</h2>
+        <p>For simple wrappers, you can use tuple structs where fields are positional rather than named. These are useful for newtype patterns or when field names would be redundant.</p>
+
+        <pre><code><span class="kw">struct</span> <span class="tp">Point</span>(<span class="tp">Int</span>, <span class="tp">Int</span>)
+<span class="kw">struct</span> <span class="tp">Color</span>(<span class="tp">Int</span>, <span class="tp">Int</span>, <span class="tp">Int</span>)
+
+<span class="kw">let</span> p = <span class="tp">Point</span>(<span class="num">3</span>, <span class="num">7</span>)
+<span class="kw">let</span> c = <span class="tp">Color</span>(<span class="num">255</span>, <span class="num">128</span>, <span class="num">0</span>)
+<span class="fn">println</span>(p.<span class="num">0</span>)  <span class="cm">// 3, accessed by position</span></code></pre>
+
+        <h2>Enums</h2>
+        <p>Enums represent a type that can be one of several variants. Each variant can optionally carry associated data. Enums are the backbone of Midori's error handling and pattern matching.</p>
+
+        <pre><code><span class="kw">enum</span> <span class="tp">Shape</span> {
+    Circle(<span class="tp">Float</span>),        <span class="cm">// radius</span>
+    Rectangle(<span class="tp">Float</span>, <span class="tp">Float</span>),  <span class="cm">// width, height</span>
+    Triangle(<span class="tp">Float</span>, <span class="tp">Float</span>),  <span class="cm">// base, height</span>
+}
+
+<span class="kw">fn</span> <span class="fn">area</span>(shape: <span class="tp">Shape</span>) -> <span class="tp">Float</span> {
+    <span class="kw">match</span> shape {
+        <span class="tp">Circle</span>(r)       => <span class="num">3.14159</span> <span class="op">*</span> r <span class="op">*</span> r,
+        <span class="tp">Rectangle</span>(w, h) => w <span class="op">*</span> h,
+        <span class="tp">Triangle</span>(b, h)  => <span class="num">0.5</span> <span class="op">*</span> b <span class="op">*</span> h,
+    }
+}</code></pre>
+
+        <h2>Methods with impl</h2>
+        <p>Methods are functions associated with a type, defined in an <code>impl</code> block. The first parameter is always <code>self</code>, which can be taken by value, by reference (<code>&amp;self</code>), or by mutable reference (<code>&amp;mut self</code>).</p>
+
+        <pre><code><span class="kw">struct</span> <span class="tp">Counter</span> {
+    value: <span class="tp">Int</span>,
+}
+
+<span class="kw">impl</span> <span class="tp">Counter</span> {
+    <span class="kw">fn</span> <span class="fn">new</span>() -> <span class="tp">Self</span> {
+        <span class="tp">Self</span> { value: <span class="num">0</span> }
+    }
+
+    <span class="kw">fn</span> <span class="fn">increment</span>(<span class="kw">mut</span> <span class="kw">self</span>) {
+        self.value = self.value <span class="op">+</span> <span class="num">1</span>
+    }
+
+    <span class="kw">fn</span> <span class="fn">current</span>(<span class="kw">self</span>) -> <span class="tp">Int</span> {
+        self.value
+    }
+}
+
+<span class="kw">let</span> <span class="kw">mut</span> c = <span class="tp">Counter</span>::<span class="fn">new</span>()
+c.<span class="fn">increment</span>()
+<span class="fn">println</span>(c.<span class="fn">current</span>())  <span class="cm">// 1</span></code></pre>
+
+        <h2>Enum with Methods</h2>
+        <p>Enums can also have methods via <code>impl</code>. This is a powerful way to attach behavior to sum types.</p>
+
+        <pre><code><span class="kw">impl</span> <span class="tp">Shape</span> {
+    <span class="kw">fn</span> <span class="fn">scale</span>(<span class="kw">self</span>, factor: <span class="tp">Float</span>) -> <span class="tp">Shape</span> {
+        <span class="kw">match</span> self {
+            <span class="tp">Circle</span>(r)       => <span class="tp">Circle</span>(r <span class="op">*</span> factor),
+            <span class="tp">Rectangle</span>(w, h) => <span class="tp">Rectangle</span>(w <span class="op">*</span> factor, h <span class="op">*</span> factor),
+            <span class="tp">Triangle</span>(b, h)  => <span class="tp">Triangle</span>(b <span class="op">*</span> factor, h <span class="op">*</span> factor),
+        }
+    }
+}</code></pre>
+
+        <div class="book-nav">
+            <a href="chapter-7.html">&larr; Previous: Control Flow</a>
+            <a href="chapter-9.html" class="next">Next: Pattern Matching &rarr;</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>Midori is free and open source. <a href="https://github.com/midori-lang/midori">Contributions welcome</a>.</p>
+        <p style="margin-top:0.5rem; font-size:0.8rem;">&copy; 2026 The Midori Contributors</p>
+    </footer>
+</body>
+</html>

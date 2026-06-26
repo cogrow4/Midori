@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Midori — A Beautiful Compiled Language</title>
+    <link rel="stylesheet" href="styles/midori.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <a href="/" class="logo">
+            <svg class="logo-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="leaf" d="M16 4C12 4 6 8 6 16C6 24 10 28 16 28C18 28 20 27 22 25C20 24 18 22 17 19C16 16 17 12 20 9C22 7 24 5 26 4C24 3 20 2 16 4Z"/>
+                <path class="leaf-accent" d="M16 28C14 28 10 26 9 22C11 23 14 23 16 21C18 19 19 15 20 12C21 10 22 8 24 7C22 9 20 12 19 16C18 20 17 24 16 28Z"/>
+            </svg>
+            <span>midori</span>
+        </a>
+        <div class="nav-links">
+            <a href="docs/">Docs</a>
+            <a href="book/">Book</a>
+            <a href="https://github.com/midori-lang/midori">GitHub</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="version-badge">
+            <span class="dot"></span>
+            v0.1.0 — Pre-release
+        </div>
+
+        <h1>A language as <span class="highlight">fresh</span> as it sounds</h1>
+        <p class="subtitle">Midori is a compiled programming language designed for developer joy. Clean syntax, strong types, zero-cost abstractions — all wrapped in an aesthetic that makes code beautiful again.</p>
+
+        <div class="code-sample">
+            <span class="comment">// hello.mi</span><br>
+            <span class="fn">fn</span> greet(name: <span class="keyword">Str</span>) -> <span class="keyword">Str</span> {<br>
+            &nbsp;&nbsp;<span class="string">"Hello, {name}!"</span><br>
+            }<br><br>
+            <span class="fn">fn</span> <span class="fn">main</span>() {<br>
+            &nbsp;&nbsp;<span class="fn">println</span>(greet(<span class="string">"Midori"</span>))<br>
+            }
+        </div>
+
+        <div class="buttons">
+            <a href="book/" class="btn btn-primary">Read the Book</a>
+            <a href="docs/" class="btn btn-secondary">Documentation</a>
+        </div>
+    </section>
+
+    <div class="stats">
+        <div class="stat-item">
+            <div class="stat-number">2K+</div>
+            <div class="stat-label">Lines of Code</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">15</div>
+            <div class="stat-label">Language Features</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">100%</div>
+            <div class="stat-label">Hand-rolled</div>
+        </div>
+    </div>
+
+    <div class="features">
+        <div class="section-label">Why Midori?</div>
+
+        <div class="feature-card">
+            <span class="feature-icon">🌿</span>
+            <h3>Beautiful Syntax</h3>
+            <p>Clean, expressive syntax that feels natural. Type inference, pattern matching, and string interpolation make code a pleasure to write. Familiar C-style braces with Pythonic sensibilities.</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon">⚡</span>
+            <h3>Compiled &amp; Fast</h3>
+            <p>Compiles through C to native machine code via Clang/GCC. Zero-cost abstractions mean you never pay for what you don't use. No runtime overhead, no garbage collector pauses.</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon">🔒</span>
+            <h3>Type Safe</h3>
+            <p>Strong static typing with full type inference. No null pointer exceptions. Option and Result types make error handling explicit and compiler-enforced.</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon">🔄</span>
+            <h3>Immutable by Default</h3>
+            <p>Variables are immutable by default. The <code>var</code> keyword makes mutability explicit, and the type system tracks it. Makes code easier to reason about and parallelize.</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon">🎯</span>
+            <h3>Developer UX First</h3>
+            <p>From the error messages to the CLI toolchain, every surface is designed to keep you in flow state. One binary, zero dependencies, instant startup.</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon">🔄</span>
+            <h3>Self-Hosting Path</h3>
+            <p>The Midori compiler is bootstrapping-ready. Written in Rust first, the plan is to rewrite the compiler in Midori itself — proving the language is production-ready.</p>
+        </div>
+    </div>
+
+    <div class="features" style="padding-top: 0;">
+        <div class="section-label">Quick Start</div>
+        <div class="feature-card" style="grid-column: 1 / -1;">
+            <pre style="background: none; border: none; padding: 0; margin: 0; font-size: 0.85rem;"><code><span class="cm"># Install</span>
+curl -fsSL https://midori-lang.dev/install.sh | sh
+
+<span class="cm"># Create and run</span>
+midori new my-project
+cd my-project
+midori run main.mi
+
+<span class="cm"># Or just run a single file</span>
+midori hello.mi <span class="cm"># Hello, Midori!</span></code></pre>
+        </div>
+    </div>
+
+    <footer>
+        <p>Midori is free and open source. <a href="https://github.com/midori-lang/midori">Contributions welcome</a>.</p>
+        <p style="margin-top:0.5rem; font-size:0.8rem;">&copy; 2026 The Midori Contributors</p>
+    </footer>
+</body>
+</html>

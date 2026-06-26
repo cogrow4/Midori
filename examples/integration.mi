@@ -1,0 +1,81 @@
+// Midori — Full feature integration test
+
+fn test_variables() -> Int {
+    let a: Int = 10
+    let b = 20
+    var c = 30
+    var(Int) d = 40
+    a + b + c + d
+}
+
+fn test_conditional(n: Int) -> Str {
+    if n > 100 {
+        "big"
+    } elif n > 50 {
+        "medium"
+    } elif n > 10 {
+        "small"
+    } else {
+        "tiny"
+    }
+}
+
+fn fib(n: Int) -> Int {
+    if n <= 1 { n } else { fib(n - 1) + fib(n - 2) }
+}
+
+fn test_while() -> Int {
+    let mut count: Int = 0
+    while count < 5 {
+        count = count + 1
+    }
+    count
+}
+
+fn test_strings() -> Str {
+    let combined: Str = "Hello" + ", " + "world" + "!"
+    if combined == "Hello, world!" {
+        combined
+    } else {
+        "mismatch"
+    }
+}
+
+fn test_for_range() -> Int {
+    let mut sum: Int = 0
+    for i in range(5) {
+        sum = sum + i
+    }
+    sum
+}
+
+fn test_interpolation(name: Str, year: Int) -> Str {
+    "Hello {name} in {str(year)}"
+}
+
+fn main() {
+    print("=== Integration Tests ===")
+    
+    let vars: Int = test_variables()
+    println(str(vars))
+    
+    let cond: Str = test_conditional(75)
+    println(cond)
+    
+    let fib_val: Int = fib(10)
+    println(str(fib_val))
+    
+    let while_val: Int = test_while()
+    println(str(while_val))
+    
+    let str_val: Str = test_strings()
+    println(str_val)
+    
+    let for_val: Int = test_for_range()
+    println(str(for_val))
+    
+    let interp: Str = test_interpolation("Midori", 2024)
+    println(interp)
+    
+    println(str(1))
+}

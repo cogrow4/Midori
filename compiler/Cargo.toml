@@ -1,0 +1,11 @@
+[package]
+name = "midori"
+version = "0.1.0"
+edition = "2021"
+description = "The Midori Programming Language compiler"
+
+[[bin]]
+name = "midori"
+path = "src/main.rs"
+
+[dependencies]

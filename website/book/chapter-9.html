@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 9 — Pattern Matching | The Midori Programming Language</title>
+    <link rel="stylesheet" href="../styles/midori.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <a href="../" class="logo">
+            <svg class="logo-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="leaf" d="M16 4C12 4 6 8 6 16C6 24 10 28 16 28C18 28 20 27 22 25C20 24 18 22 17 19C16 16 17 12 20 9C22 7 24 5 26 4C24 3 20 2 16 4Z"/>
+                <path class="leaf-accent" d="M16 28C14 28 10 26 9 22C11 23 14 23 16 21C18 19 19 15 20 12C21 10 22 8 24 7C22 9 20 12 19 16C18 20 17 24 16 28Z"/>
+            </svg>
+            <span>midori</span>
+        </a>
+        <div class="nav-links">
+            <a href="../docs/">Docs</a>
+            <a href="../book/">Book</a>
+            <a href="https://github.com/midori-lang/midori">GitHub</a>
+        </div>
+    </nav>
+
+    <div class="content">
+        <h1>Chapter 9: Pattern Matching</h1>
+
+        <h2>Match Expressions</h2>
+        <p>Pattern matching is one of Midori's most powerful features. The <code>match</code> expression compares a value against a series of patterns, executing the first matching arm. The compiler checks that all cases are covered &mdash; no more runtime "undefined" surprises.</p>
+
+        <pre><code><span class="kw">match</span> number {
+    <span class="num">0</span> => <span class="str">"none"</span>,
+    <span class="num">1</span> => <span class="str">"one"</span>,
+    <span class="num">2</span> => <span class="str">"a couple"</span>,
+    _  => <span class="str">"many"</span>,  <span class="cm">// wildcard — matches anything</span>
+}</code></pre>
+
+        <h2>Destructuring</h2>
+        <p>Match arms can destructure complex data types, binding parts of the value to variables. This works for structs, enums, tuples, and lists. Destructuring also works in <code>let</code> bindings and function parameters.</p>
+
+        <pre><code><span class="kw">struct</span> <span class="tp">Point</span> { x: <span class="tp">Int</span>, y: <span class="tp">Int</span> }
+
+<span class="kw">fn</span> <span class="fn">describe</span>(p: <span class="tp">Point</span>) -> <span class="tp">Str</span> {
+    <span class="kw">match</span> p {
+        <span class="tp">Point</span> { x: <span class="num">0</span>, y: <span class="num">0</span> } => <span class="str">"origin"</span>,
+        <span class="tp">Point</span> { x: <span class="num">0</span>, y }     => <span class="str">"on y-axis at {y}"</span>,
+        <span class="tp">Point</span> { x, y: <span class="num">0</span> }     => <span class="str">"on x-axis at {x}"</span>,
+        <span class="tp">Point</span> { x, y }           => <span class="str">"at ({x}, {y})"</span>,
+    }
+}
+
+<span class="cm">// Destructuring in let bindings</span>
+<span class="kw">let</span> <span class="tp">Point</span> { x, y } = origin</code></pre>
+
+        <h2>Guards</h2>
+        <p>Match arms can have guards &mdash; additional conditions written after <code>if</code> that must be true for the arm to match. This lets you express complex conditional logic concisely.</p>
+
+        <pre><code><span class="kw">fn</span> <span class="fn">classify</span>(n: <span class="tp">Int</span>) -> <span class="tp">Str</span> {
+    <span class="kw">match</span> n {
+        <span class="num">0</span> => <span class="str">"zero"</span>,
+        n <span class="kw">if</span> n &lt; <span class="num">0</span> => <span class="str">"negative"</span>,
+        n <span class="kw">if</span> <span class="fn">is_perfect_square</span>(n) => <span class="str">"perfect square"</span>,
+        _ => <span class="str">"positive"</span>,
+    }
+}</code></pre>
+
+        <h2>Matching on Enums</h2>
+        <p>Pattern matching on enums is where the feature truly shines. The compiler ensures every variant is handled, and each arm can extract the associated data.</p>
+
+        <pre><code><span class="kw">enum</span> <span class="tp">Status</span> {
+    Active,
+    Inactive(<span class="tp">Str</span>),
+    Banned { reason: <span class="tp">Str</span>, until: <span class="tp">Str</span> },
+}
+
+<span class="kw">fn</span> <span class="fn">render</span>(status: <span class="tp">Status</span>) -> <span class="tp">Str</span> {
+    <span class="kw">match</span> status {
+        <span class="tp">Active</span>                    => <span class="str">"Account is active"</span>,
+        <span class="tp">Inactive</span>(reason)          => <span class="str">"Inactive: {reason}"</span>,
+        <span class="tp">Banned</span> { reason, until }   => <span class="str">"Banned until {until}: {reason}"</span>,
+    }
+}</code></pre>
+
+        <h2>Combining Patterns</h2>
+        <p>The pipe operator <code>|</code> inside a pattern matches multiple alternatives. This is useful when several variants should produce the same result.</p>
+
+        <pre><code><span class="kw">fn</span> <span class="fn">is_weekend</span>(day: <span class="tp">Weekday</span>) -> <span class="tp">Bool</span> {
+    <span class="kw">match</span> day {
+        <span class="tp">Saturday</span> | <span class="tp">Sunday</span> => <span class="tp">true</span>,
+        _ => <span class="tp">false</span>,
+    }
+}
+
+<span class="cm">// Nested pattern matching</span>
+<span class="kw">match</span> data {
+    <span class="tp">Some</span>(<span class="tp">Ok</span>(value)) => <span class="fn">process</span>(value),
+    <span class="tp">Some</span>(<span class="tp">Err</span>(e))    => <span class="fn">log_error</span>(e),
+    <span class="tp">None</span>             => <span class="str">"no data"</span>,
+}</code></pre>
+
+        <div class="book-nav">
+            <a href="chapter-8.html">&larr; Previous: Structs and Enums</a>
+            <a href="chapter-10.html" class="next">Next: Error Handling &rarr;</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>Midori is free and open source. <a href="https://github.com/midori-lang/midori">Contributions welcome</a>.</p>
+        <p style="margin-top:0.5rem; font-size:0.8rem;">&copy; 2026 The Midori Contributors</p>
+    </footer>
+</body>
+</html>

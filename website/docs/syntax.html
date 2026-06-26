@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syntax — Midori</title>
+    <link rel="stylesheet" href="../styles/midori.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <a href="/" class="logo">
+            <svg class="logo-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="leaf" d="M16 4C12 4 6 8 6 16C6 24 10 28 16 28C18 28 20 27 22 25C20 24 18 22 17 19C16 16 17 12 20 9C22 7 24 5 26 4C24 3 20 2 16 4Z"/>
+                <path class="leaf-accent" d="M16 28C14 28 10 26 9 22C11 23 14 23 16 21C18 19 19 15 20 12C21 10 22 8 24 7C22 9 20 12 19 16C18 20 17 24 16 28Z"/>
+            </svg>
+            <span>midori</span>
+        </a>
+        <div class="nav-links">
+            <a href="../docs/">Docs</a>
+            <a href="../book/">Book</a>
+            <a href="https://github.com/midori-lang/midori">GitHub</a>
+        </div>
+    </nav>
+
+    <div class="content">
+        <h1>Syntax</h1>
+
+        <h2>Comments</h2>
+        <p>Midori supports line comments and block comments:</p>
+
+        <pre><code><span class="cm">// This is a line comment</span>
+
+<span class="cm">/* This is a block comment
+   that spans multiple lines */</span>
+
+<span class="cm">/* Comments can be /* nested */ inside each other */</span></code></pre>
+
+        <h2>String Interpolation</h2>
+        <p>Strings support interpolation with curly braces:</p>
+
+        <pre><code><span class="kw">let</span> name = <span class="str">"Midori"</span>
+<span class="kw">let</span> version = <span class="num">1</span>
+<span class="kw">let</span> msg = <span class="str">"Welcome to {name}, v{version}.{version + 1}!"</span></code></pre>
+
+        <h2>Variable Binding</h2>
+        <p>Use <code>let</code> to bind values. Variables are immutable by default; use <code>mut</code> for mutable bindings:</p>
+
+        <pre><code><span class="kw">let</span> x = <span class="num">42</span>                <span class="cm">// immutable</span>
+<span class="kw">let</span> <span class="kw">mut</span> y = <span class="num">10</span>             <span class="cm">// mutable</span>
+y = y + <span class="num">5</span>
+
+<span class="cm">// Type annotations are optional</span>
+<span class="kw">let</span> z: <span class="tp">Int</span> = <span class="num">7</span></code></pre>
+
+        <h2>Operators</h2>
+        <p>Midori supports standard arithmetic and comparison operators:</p>
+
+        <pre><code><span class="cm">// Arithmetic</span>
+<span class="kw">let</span> sum = <span class="num">10</span> <span class="op">+</span> <span class="num">5</span>      <span class="cm">// addition</span>
+<span class="kw">let</span> diff = <span class="num">10</span> <span class="op">-</span> <span class="num">5</span>     <span class="cm">// subtraction</span>
+<span class="kw">let</span> prod = <span class="num">10</span> <span class="op">*</span> <span class="num">5</span>     <span class="cm">// multiplication</span>
+<span class="kw">let</span> quot = <span class="num">10</span> <span class="op">/</span> <span class="num">5</span>     <span class="cm">// division</span>
+<span class="kw">let</span> rem = <span class="num">10</span> <span class="op">%</span> <span class="num">3</span>      <span class="cm">// modulo</span>
+
+<span class="cm">// Comparison</span>
+<span class="kw">let</span> eq = <span class="num">5</span> <span class="op">==</span> <span class="num">5</span>       <span class="cm">// equal</span>
+<span class="kw">let</span> ne = <span class="num">5</span> <span class="op">!=</span> <span class="num">3</span>       <span class="cm">// not equal</span>
+<span class="kw">let</span> lt = <span class="num">3</span> <span class="op">&lt;</span> <span class="num">5</span>        <span class="cm">// less than</span>
+<span class="kw">let</span> gt = <span class="num">5</span> <span class="op">&gt;</span> <span class="num">3</span>        <span class="cm">// greater than</span>
+<span class="kw">let</span> le = <span class="num">5</span> <span class="op">&lt;=</span> <span class="num">5</span>       <span class="cm">// less than or equal</span>
+<span class="kw">let</span> ge = <span class="num">5</span> <span class="op">&gt;=</span> <span class="num">3</span>       <span class="cm">// greater than or equal</span>
+
+<span class="cm">// Logical</span>
+<span class="kw">let</span> and = <span class="kw">true</span> <span class="op">&amp;&amp;</span> <span class="kw">false</span>  <span class="cm">// logical and</span>
+<span class="kw">let</span> or = <span class="kw">true</span> <span class="op">||</span> <span class="kw">false</span>   <span class="cm">// logical or</span>
+<span class="kw">let</span> not = <span class="op">!</span><span class="kw">true</span>           <span class="cm">// logical not</span></code></pre>
+
+        <h2>Pipe Operator</h2>
+        <p>The pipe operator <code>|&gt;</code> passes a value as the last argument to a function, enabling clean chaining:</p>
+
+        <pre><code><span class="kw">let</span> result = <span class="str">"hello"</span>
+    <span class="op">|&gt;</span> capitalize()
+    <span class="op">|&gt;</span> greet()
+    <span class="op">|&gt;</span> println()
+
+<span class="cm">// Equivalent to:</span>
+println(greet(capitalize(<span class="str">"hello"</span>)))</code></pre>
+
+        <h2>Ranges</h2>
+        <p>The <code>..</code> operator creates an inclusive range:</p>
+
+        <pre><code><span class="kw">let</span> range = <span class="num">0</span> <span class="op">..</span> <span class="num">10</span>  <span class="cm">// 0, 1, 2, ..., 10</span>
+
+<span class="kw">for</span> i <span class="kw">in</span> <span class="num">1</span> <span class="op">..</span> <span class="num">5</span> {
+    println(i)
+}
+<span class="cm">// Prints 1, 2, 3, 4, 5</span></code></pre>
+
+        <h2>Semicolons and Newlines</h2>
+        <p>Semicolons are optional. Newlines act as statement separators:</p>
+
+        <pre><code><span class="kw">let</span> a = <span class="num">1</span>
+<span class="kw">let</span> b = <span class="num">2</span>
+
+<span class="cm">// You can use semicolons to put multiple statements on one line</span>
+<span class="kw">let</span> x = <span class="num">1</span>; <span class="kw">let</span> y = <span class="num">2</span>; <span class="kw">let</span> z = <span class="num">3</span></code></pre>
+
+        <div class="book-nav">
+            <a href="getting-started.html">&larr; Getting Started</a>
+            <a href="types.html" class="next">Types &rarr;</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>Midori is free and open source. <a href="https://github.com/midori-lang/midori">Contributions welcome</a>.</p>
+        <p style="margin-top:0.5rem; font-size:0.8rem;">&copy; 2026 The Midori Contributors</p>
+    </footer>
+</body>
+</html>

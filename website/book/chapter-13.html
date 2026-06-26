@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 13 — Building and Testing | The Midori Programming Language</title>
+    <link rel="stylesheet" href="../styles/midori.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <a href="../" class="logo">
+            <svg class="logo-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="leaf" d="M16 4C12 4 6 8 6 16C6 24 10 28 16 28C18 28 20 27 22 25C20 24 18 22 17 19C16 16 17 12 20 9C22 7 24 5 26 4C24 3 20 2 16 4Z"/>
+                <path class="leaf-accent" d="M16 28C14 28 10 26 9 22C11 23 14 23 16 21C18 19 19 15 20 12C21 10 22 8 24 7C22 9 20 12 19 16C18 20 17 24 16 28Z"/>
+            </svg>
+            <span>midori</span>
+        </a>
+        <div class="nav-links">
+            <a href="../docs/">Docs</a>
+            <a href="../book/">Book</a>
+            <a href="https://github.com/midori-lang/midori">GitHub</a>
+        </div>
+    </nav>
+
+    <div class="content">
+        <h1>Chapter 13: Building and Testing</h1>
+
+        <h2>Compilation</h2>
+        <p>The <code>midori build</code> command compiles your project into a native binary. The compiler first translates Midori to C, then uses the system C compiler (Clang or GCC) to produce machine code. This two-phase approach gives Midori access to the entire C ecosystem while providing a modern language experience.</p>
+
+        <pre><code><span class="cm"># Build in release mode with optimizations</span>
+midori build --release
+
+<span class="cm"># Build with debug symbols</span>
+midori build --debug
+
+<span class="cm"># Check for errors without generating code</span>
+midori check</code></pre>
+
+        <p>Release mode enables all optimizations, resulting in faster but slower-to-compile binaries. Debug mode adds debug information and disables optimizations for a better debugging experience.</p>
+
+        <h2>Running Tests</h2>
+        <p>Midori has built-in test support. Test functions are annotated with the <code>@test</code> attribute and placed in test modules. The <code>midori test</code> command finds and runs all tests in the project.</p>
+
+        <pre><code><span class="cm">// src/math/basic.mi</span>
+<span class="kw">fn</span> <span class="fn">add</span>(a: <span class="tp">Int</span>, b: <span class="tp">Int</span>) -> <span class="tp">Int</span> { a <span class="op">+</span> b }
+
+<span class="cm">@test</span>
+<span class="kw">fn</span> <span class="fn">test_add</span>() {
+    <span class="fn">assert_eq</span>(<span class="fn">add</span>(<span class="num">2</span>, <span class="num">3</span>), <span class="num">5</span>)
+    <span class="fn">assert_eq</span>(<span class="fn">add</span>(<span class="num">-1</span>, <span class="num">1</span>), <span class="num">0</span>)
+    <span class="fn">assert_eq</span>(<span class="fn">add</span>(<span class="num">0</span>, <span class="num">0</span>), <span class="num">0</span>)
+}</code></pre>
+
+        <h2>Test Organization</h2>
+        <p>Tests can be placed alongside code using a <code>tests</code> module, or in a separate <code>tests/</code> directory for integration tests. Unit tests go in the same file as the code they test; integration tests go in the <code>tests/</code> directory and can only access the public API.</p>
+
+        <pre><code><span class="cm">// Inline unit tests — tested with `midori test`</span>
+<span class="kw">fn</span> <span class="fn">parse</span>(input: <span class="tp">Str</span>) -> <span class="tp">Option</span>&lt;<span class="tp">Int</span>&gt; {
+    <span class="cm">// implementation</span>
+}
+
+<span class="cm">@test</span>
+<span class="kw">fn</span> <span class="fn">test_parse_valid</span>() {
+    <span class="fn">assert_eq</span>(<span class="fn">parse</span>(<span class="str">"42"</span>), <span class="tp">Some</span>(<span class="num">42</span>))
+}
+
+<span class="cm">// tests/integration.mi — integration tests</span>
+<span class="kw">use</span> my_project
+
+<span class="cm">@test</span>
+<span class="kw">fn</span> <span class="fn">end_to_end</span>() {
+    <span class="cm">// test the public API</span>
+}</code></pre>
+
+        <h2>Test Assertions</h2>
+        <p>Midori provides a rich set of assertion macros for testing. Beyond simple equality, you can check for expected errors, panics, and approximate floating-point values.</p>
+
+        <pre><code><span class="cm">@test</span>
+<span class="kw">fn</span> <span class="fn">test_advanced</span>() {
+    <span class="fn">assert_eq</span>(result, expected)
+    <span class="fn">assert_ne</span>(result, wrong)
+    <span class="fn">assert_true</span>(condition)
+    <span class="fn">assert_false</span>(condition)
+
+    <span class="cm">// Assert that an expression returns an error</span>
+    <span class="fn">assert_err</span>(<span class="fn">divide</span>(<span class="num">1</span>, <span class="num">0</span>))
+
+    <span class="cm">// Floating-point approximate equality</span>
+    <span class="fn">assert_approx_eq</span>(<span class="num">0.1</span> <span class="op">+</span> <span class="num">0.2</span>, <span class="num">0.3</span>)
+}</code></pre>
+
+        <h2>Benchmarking</h2>
+        <p>Midori includes a built-in benchmarking framework. Use the <code>@bench</code> attribute to mark benchmark functions. The framework runs the function multiple times and reports timing statistics.</p>
+
+        <pre><code><span class="cm">@bench</span>
+<span class="kw">fn</span> <span class="fn">bench_sort</span>() {
+    <span class="kw">let</span> <span class="kw">mut</span> data = [<span class="num">3</span>, <span class="num">1</span>, <span class="num">4</span>, <span class="num">1</span>, <span class="num">5</span>, <span class="num">9</span>, <span class="num">2</span>, <span class="num">6</span>]
+    <span class="fn">sort</span>(<span class="op">&amp;</span><span class="kw">mut</span> data)
+}
+
+<span class="cm"># Run benchmarks</span>
+midori bench</code></pre>
+
+        <div class="book-nav">
+            <a href="chapter-12.html">&larr; Previous: Modules and Organization</a>
+            <a href="chapter-14.html" class="next">Next: The Standard Library &rarr;</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>Midori is free and open source. <a href="https://github.com/midori-lang/midori">Contributions welcome</a>.</p>
+        <p style="margin-top:0.5rem; font-size:0.8rem;">&copy; 2026 The Midori Contributors</p>
+    </footer>
+</body>
+</html>

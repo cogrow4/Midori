@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 7 — Control Flow | The Midori Programming Language</title>
+    <link rel="stylesheet" href="../styles/midori.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <a href="../" class="logo">
+            <svg class="logo-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="leaf" d="M16 4C12 4 6 8 6 16C6 24 10 28 16 28C18 28 20 27 22 25C20 24 18 22 17 19C16 16 17 12 20 9C22 7 24 5 26 4C24 3 20 2 16 4Z"/>
+                <path class="leaf-accent" d="M16 28C14 28 10 26 9 22C11 23 14 23 16 21C18 19 19 15 20 12C21 10 22 8 24 7C22 9 20 12 19 16C18 20 17 24 16 28Z"/>
+            </svg>
+            <span>midori</span>
+        </a>
+        <div class="nav-links">
+            <a href="../docs/">Docs</a>
+            <a href="../book/">Book</a>
+            <a href="https://github.com/midori-lang/midori">GitHub</a>
+        </div>
+    </nav>
+
+    <div class="content">
+        <h1>Chapter 7: Control Flow</h1>
+
+        <h2>if Expressions</h2>
+        <p>In Midori, <code>if</code> is an expression, not a statement. It always returns a value, and both branches must produce the same type. The optional <code>elif</code> keyword chains additional conditions without nesting.</p>
+
+        <pre><code><span class="kw">let</span> status = <span class="kw">if</span> temperature &gt; <span class="num">30</span> {
+    <span class="str">"hot"</span>
+} <span class="kw">elif</span> temperature &gt; <span class="num">20</span> {
+    <span class="str">"warm"</span>
+} <span class="kw">else</span> {
+    <span class="str">"cool"</span>
+}</code></pre>
+
+        <h2>match Expressions</h2>
+        <p>The <code>match</code> expression is Midori's powerful pattern matching construct. It compares a value against a series of patterns and executes the arm that matches. Match arms can destructure data, bind variables, and include guards.</p>
+
+        <pre><code><span class="kw">match</span> value {
+    <span class="num">0</span>                  => <span class="str">"zero"</span>,
+    <span class="num">1</span> | <span class="num">2</span>              => <span class="str">"small"</span>,
+    n <span class="kw">if</span> n &lt; <span class="num">10</span>       => <span class="str">"less than ten"</span>,
+    _                   => <span class="str">"other"</span>,
+}</code></pre>
+
+        <h2>For Loops</h2>
+        <p>The <code>for</code> loop iterates over any iterable value. Midori's standard library provides ranges (<code>0..n</code> for exclusive, <code>0..=n</code> for inclusive) and collection iterators.</p>
+
+        <pre><code><span class="cm">// Range-based for loop</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="num">0</span>..<span class="num">5</span> {
+    <span class="fn">println</span>(<span class="str">"count {i}"</span>)
+}
+
+<span class="cm">// Iterate over a list</span>
+<span class="kw">for</span> item <span class="kw">in</span> items {
+    <span class="fn">println</span>(item)
+}
+
+<span class="cm">// With index and value destructuring</span>
+<span class="kw">for</span> (i, val) <span class="kw">in</span> <span class="fn">enumerate</span>(items) {
+    <span class="fn">println</span>(<span class="str">"[{i}] = {val}"</span>)
+}</code></pre>
+
+        <h2>While Loops</h2>
+        <p>The <code>while</code> loop repeats a block as long as a condition is true. It is the simplest looping construct and is ideal when the number of iterations is not known in advance.</p>
+
+        <pre><code><span class="kw">let</span> <span class="kw">mut</span> n = <span class="num">100</span>
+<span class="kw">while</span> n &gt; <span class="num">1</span> {
+    n = <span class="kw">if</span> n <span class="op">%</span> <span class="num">2</span> == <span class="num">0</span> { n / <span class="num">2</span> }
+         <span class="kw">else</span>          { n <span class="op">*</span> <span class="num">3</span> <span class="op">+</span> <span class="num">1</span> }
+    <span class="fn">println</span>(n)
+}</code></pre>
+
+        <h2>Loop and break/continue</h2>
+        <p>The bare <code>loop</code> creates an infinite loop. Use <code>break</code> to exit and <code>continue</code> to skip to the next iteration. Both <code>break</code> and <code>continue</code> work in <code>for</code> and <code>while</code> loops as well. <code>break</code> can return a value from a <code>loop</code>.</p>
+
+        <pre><code><span class="kw">let</span> <span class="kw">mut</span> guess = <span class="num">0</span>
+<span class="kw">let</span> answer = <span class="kw">loop</span> {
+    guess = guess <span class="op">+</span> <span class="num">1</span>
+    <span class="kw">if</span> <span class="fn">check</span>(guess) {
+        <span class="kw">break</span> guess  <span class="cm">// loop returns the value</span>
+    }
+    <span class="kw">if</span> guess &gt; <span class="num">100</span> {
+        <span class="kw">break</span> <span class="num">0</span>     <span class="cm">// default value</span>
+    }
+}
+
+<span class="cm">// Loop labels for nested control flow</span>
+<span class="kw">'outer:</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="num">0</span>..<span class="num">10</span> {
+    <span class="kw">for</span> y <span class="kw">in</span> <span class="num">0</span>..<span class="num">10</span> {
+        <span class="kw">if</span> x <span class="op">*</span> y == <span class="num">42</span> {
+            <span class="kw">break</span> <span class="str">'outer</span>
+        }
+    }
+}</code></pre>
+
+        <div class="book-nav">
+            <a href="chapter-6.html">&larr; Previous: Functions</a>
+            <a href="chapter-8.html" class="next">Next: Structs and Enums &rarr;</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>Midori is free and open source. <a href="https://github.com/midori-lang/midori">Contributions welcome</a>.</p>
+        <p style="margin-top:0.5rem; font-size:0.8rem;">&copy; 2026 The Midori Contributors</p>
+    </footer>
+</body>
+</html>

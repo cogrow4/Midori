@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 11 — Traits and Generics | The Midori Programming Language</title>
+    <link rel="stylesheet" href="../styles/midori.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <a href="../" class="logo">
+            <svg class="logo-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="leaf" d="M16 4C12 4 6 8 6 16C6 24 10 28 16 28C18 28 20 27 22 25C20 24 18 22 17 19C16 16 17 12 20 9C22 7 24 5 26 4C24 3 20 2 16 4Z"/>
+                <path class="leaf-accent" d="M16 28C14 28 10 26 9 22C11 23 14 23 16 21C18 19 19 15 20 12C21 10 22 8 24 7C22 9 20 12 19 16C18 20 17 24 16 28Z"/>
+            </svg>
+            <span>midori</span>
+        </a>
+        <div class="nav-links">
+            <a href="../docs/">Docs</a>
+            <a href="../book/">Book</a>
+            <a href="https://github.com/midori-lang/midori">GitHub</a>
+        </div>
+    </nav>
+
+    <div class="content">
+        <h1>Chapter 11: Traits and Generics</h1>
+
+        <h2>Traits</h2>
+        <p>Traits are Midori's mechanism for defining shared behavior across types. A trait declares a set of method signatures that implementing types must provide. This is similar to interfaces in other languages, but with more power &mdash; traits can have default implementations, associated types, and supertraits.</p>
+
+        <pre><code><span class="kw">trait</span> <span class="tp">Describable</span> {
+    <span class="kw">fn</span> <span class="fn">describe</span>(<span class="kw">self</span>) -> <span class="tp">Str</span>
+}
+
+<span class="kw">impl</span> <span class="tp">Describable</span> <span class="kw">for</span> <span class="tp">User</span> {
+    <span class="kw">fn</span> <span class="fn">describe</span>(<span class="kw">self</span>) -> <span class="tp">Str</span> {
+        <span class="str">"User: {self.name} (age {self.age})"</span>
+    }
+}</code></pre>
+
+        <h2>Default Implementations</h2>
+        <p>Traits can provide default implementations for some methods. Types that implement the trait can override these or use the defaults. This is useful for providing sensible defaults while still allowing customization.</p>
+
+        <pre><code><span class="kw">trait</span> <span class="tp">Greeter</span> {
+    <span class="kw">fn</span> <span class="fn">greeting</span>(<span class="kw">self</span>) -> <span class="tp">Str</span> { <span class="str">"Hello!"</span> }
+    <span class="kw">fn</span> <span class="fn">greet</span>(<span class="kw">self</span>) {
+        <span class="fn">println</span>(self.<span class="fn">greeting</span>())
+    }
+}
+
+<span class="kw">impl</span> <span class="tp">Greeter</span> <span class="kw">for</span> <span class="tp">User</span> {
+    <span class="cm">// Uses default greet, overrides greeting</span>
+    <span class="kw">fn</span> <span class="fn">greeting</span>(<span class="kw">self</span>) -> <span class="tp">Str</span> {
+        <span class="str">"Hi, I'm {self.name}!"</span>
+    }
+}</code></pre>
+
+        <h2>Generic Functions</h2>
+        <p>Generics allow functions and types to work with any type while maintaining full type safety. Type parameters are declared in angle brackets <code>&lt;T&gt;</code> and can be constrained by traits. Midori's generics are monomorphized &mdash; each concrete instantiation generates specialized code with no runtime overhead.</p>
+
+        <pre><code><span class="cm">// Identity function — works for any type</span>
+<span class="kw">fn</span> <span class="fn">id</span>&lt;<span class="tp">T</span>&gt;(value: <span class="tp">T</span>) -> <span class="tp">T</span> { value }
+
+<span class="cm">// Generic with trait bound</span>
+<span class="kw">fn</span> <span class="fn">print_descriptions</span>&lt;<span class="tp">T</span>: <span class="tp">Describable</span>&gt;(items: [<span class="tp">T</span>]) {
+    <span class="kw">for</span> item <span class="kw">in</span> items {
+        <span class="fn">println</span>(item.<span class="fn">describe</span>())
+    }
+}</code></pre>
+
+        <h2>Generic Structs and Enums</h2>
+        <p>Types themselves can be generic. This is how <code>Option&lt;T&gt;</code>, <code>Result&lt;T, E&gt;</code>, and collection types like <code>List&lt;T&gt;</code> are defined in the standard library.</p>
+
+        <pre><code><span class="kw">struct</span> <span class="tp">Pair</span>&lt;<span class="tp">A</span>, <span class="tp">B</span>&gt; {
+    first: <span class="tp">A</span>,
+    second: <span class="tp">B</span>,
+}
+
+<span class="kw">enum</span> <span class="tp">Result</span>&lt;<span class="tp">T</span>, <span class="tp">E</span>&gt; {
+    <span class="tp">Ok</span>(<span class="tp">T</span>),
+    <span class="tp">Err</span>(<span class="tp">E</span>),
+}
+
+<span class="kw">impl</span>&lt;<span class="tp">A</span>, <span class="tp">B</span>&gt; <span class="tp">Pair</span>&lt;<span class="tp">A</span>, <span class="tp">B</span>&gt; {
+    <span class="kw">fn</span> <span class="fn">swap</span>(<span class="kw">self</span>) -> <span class="tp">Pair</span>&lt;<span class="tp">B</span>, <span class="tp">A</span>&gt; {
+        <span class="tp">Pair</span> { first: self.second, second: self.first }
+    }
+}</code></pre>
+
+        <h2>Supertraits</h2>
+        <p>Traits can extend other traits, forming a hierarchy. A type implementing a subtrait must also implement all supertraits.</p>
+
+        <pre><code><span class="kw">trait</span> <span class="tp">Printable</span> {
+    <span class="kw">fn</span> <span class="fn">print</span>(<span class="kw">self</span>)
+}
+
+<span class="kw">trait</span> <span class="tp">JsonSerializable</span>: <span class="tp">Printable</span> {
+    <span class="kw">fn</span> <span class="fn">to_json</span>(<span class="kw">self</span>) -> <span class="tp">Str</span>
+}
+
+<span class="kw">impl</span> <span class="tp">JsonSerializable</span> <span class="kw">for</span> <span class="tp">Config</span> {
+    <span class="kw">fn</span> <span class="fn">print</span>(<span class="kw">self</span>)   { <span class="fn">println</span>(<span class="str">"{self}"</span>) }
+    <span class="kw">fn</span> <span class="fn">to_json</span>(<span class="kw">self</span>) -> <span class="tp">Str</span> {
+        <span class="str">"{ \"key\": \"{self.value}\" }"</span>
+    }
+}</code></pre>
+
+        <div class="book-nav">
+            <a href="chapter-10.html">&larr; Previous: Error Handling</a>
+            <a href="chapter-12.html" class="next">Next: Modules and Organization &rarr;</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>Midori is free and open source. <a href="https://github.com/midori-lang/midori">Contributions welcome</a>.</p>
+        <p style="margin-top:0.5rem; font-size:0.8rem;">&copy; 2026 The Midori Contributors</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,6 @@
+fn main() {
+    let x: Int = 42
+    let y: Str = "Midori"
+    let z: Bool = true
+    println(y)
+}

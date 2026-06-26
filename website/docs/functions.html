@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Functions — Midori</title>
+    <link rel="stylesheet" href="../styles/midori.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <a href="/" class="logo">
+            <svg class="logo-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="leaf" d="M16 4C12 4 6 8 6 16C6 24 10 28 16 28C18 28 20 27 22 25C20 24 18 22 17 19C16 16 17 12 20 9C22 7 24 5 26 4C24 3 20 2 16 4Z"/>
+                <path class="leaf-accent" d="M16 28C14 28 10 26 9 22C11 23 14 23 16 21C18 19 19 15 20 12C21 10 22 8 24 7C22 9 20 12 19 16C18 20 17 24 16 28Z"/>
+            </svg>
+            <span>midori</span>
+        </a>
+        <div class="nav-links">
+            <a href="../docs/">Docs</a>
+            <a href="../book/">Book</a>
+            <a href="https://github.com/midori-lang/midori">GitHub</a>
+        </div>
+    </nav>
+
+    <div class="content">
+        <h1>Functions</h1>
+
+        <h2>Defining Functions</h2>
+        <p>Use the <code>fn</code> keyword to define a function. Parameters are annotated with types, and the return type follows <code>-&gt;</code>:</p>
+
+        <pre><code><span class="kw">fn</span> greet(name: <span class="tp">Str</span>) -> <span class="tp">Str</span> {
+    <span class="str">"Hello, {name}!"</span>
+}
+
+<span class="kw">fn</span> main() {
+    println(greet(<span class="str">"Midori"</span>))
+}</code></pre>
+
+        <h2>Implicit Return</h2>
+        <p>The last expression in a function body is automatically returned. No <code>return</code> keyword needed:</p>
+
+        <pre><code><span class="kw">fn</span> add(x: <span class="tp">Int</span>, y: <span class="tp">Int</span>) -> <span class="tp">Int</span> {
+    x <span class="op">+</span> y   <span class="cm">// implicitly returned</span>
+}
+
+<span class="kw">fn</span> factorial(n: <span class="tp">Int</span>) -> <span class="tp">Int</span> {
+    <span class="kw">if</span> n <span class="op">&lt;=</span> <span class="num">1</span> {
+        <span class="num">1</span>                   <span class="cm">// early return via expression</span>
+    } <span class="kw">else</span> {
+        n <span class="op">*</span> factorial(n <span class="op">-</span> <span class="num">1</span>)  <span class="cm">// recursive call</span>
+    }
+}</code></pre>
+
+        <h2>Parameters and Default Values</h2>
+        <p>Functions can have default parameter values:</p>
+
+        <pre><code><span class="kw">fn</span> greet(name: <span class="tp">Str</span>, greeting: <span class="tp">Str</span> = <span class="str">"Hello"</span>) -> <span class="tp">Str</span> {
+    <span class="str">"{greeting}, {name}!"</span>
+}
+
+println(greet(<span class="str">"Midori"</span>))         <span class="cm">// "Hello, Midori!"</span>
+println(greet(<span class="str">"Midori"</span>, <span class="str">"Hi"</span>))  <span class="cm">// "Hi, Midori!"</span></code></pre>
+
+        <h2>Anonymous Functions (Closures)</h2>
+        <p>Define inline functions with <code>fn</code> without a name. They can capture variables from their enclosing scope:</p>
+
+        <pre><code><span class="kw">let</span> double = <span class="kw">fn</span>(x: <span class="tp">Int</span>) -> <span class="tp">Int</span> { x <span class="op">*</span> <span class="num">2</span> }
+println(double(<span class="num">5</span>))  <span class="cm">// 10</span>
+
+<span class="cm">// Short form for simple closures</span>
+<span class="kw">let</span> triple = <span class="kw">fn</span>(x) { x <span class="op">*</span> <span class="num">3</span> }
+
+<span class="cm">// Capturing variables</span>
+<span class="kw">let</span> factor = <span class="num">10</span>
+<span class="kw">let</span> multiply = <span class="kw">fn</span>(x: <span class="tp">Int</span>) { x <span class="op">*</span> factor }
+
+<span class="cm">// Passing closures to higher-order functions</span>
+<span class="kw">let</span> numbers = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>]
+<span class="kw">let</span> doubled = numbers.map(<span class="kw">fn</span>(x) { x <span class="op">*</span> <span class="num">2</span> })</code></pre>
+
+        <h2>Pipe Operator</h2>
+        <p>The <code>|&gt;</code> operator threads a value through a function call, making chains more readable:</p>
+
+        <pre><code><span class="kw">fn</span> clean(s: <span class="tp">Str</span>) -> <span class="tp">Str</span> { s.trim().lowercase() }
+<span class="kw">fn</span> wrap(s: <span class="tp">Str</span>) -> <span class="tp">Str</span> { <span class="str">"[{s}]"</span> }
+
+<span class="cm">// Without pipe — nested calls read inside-out</span>
+println(wrap(clean(<span class="str">"  Hello  "</span>)))
+
+<span class="cm">// With pipe — left-to-right, top-to-bottom</span>
+<span class="str">"  Hello  "</span>
+    <span class="op">|&gt;</span> clean()
+    <span class="op">|&gt;</span> wrap()
+    <span class="op">|&gt;</span> println()
+
+<span class="cm">// Output: [hello]</span></code></pre>
+
+        <h2>Method Calls</h2>
+        <p>Types can have methods defined via <code>impl</code> blocks. Method calls use dot notation:</p>
+
+        <pre><code><span class="kw">type</span> <span class="tp">Vec2</span> {
+    x: <span class="tp">Float</span>,
+    y: <span class="tp">Float</span>,
+}
+
+<span class="kw">impl</span> <span class="tp">Vec2</span> {
+    <span class="kw">fn</span> length(<span class="kw">self</span>) -> <span class="tp">Float</span> {
+        (self.x <span class="op">*</span> self.x <span class="op">+</span> self.y <span class="op">*</span> self.y).sqrt()
+    }
+
+    <span class="kw">fn</span> add(<span class="kw">self</span>, other: <span class="tp">Vec2</span>) -> <span class="tp">Vec2</span> {
+        <span class="tp">Vec2</span> { x: self.x <span class="op">+</span> other.x, y: self.y <span class="op">+</span> other.y }
+    }
+}
+
+<span class="kw">let</span> v = <span class="tp">Vec2</span> { x: <span class="num">3.0</span>, y: <span class="num">4.0</span> }
+println(v.length())  <span class="cm">// 5.0</span></code></pre>
+
+        <h2>Functions as Values</h2>
+        <p>Functions are first-class values and can be passed around:</p>
+
+        <pre><code><span class="kw">fn</span> apply_twice(f: <span class="kw">fn</span>(<span class="tp">Int</span>) -> <span class="tp">Int</span>, x: <span class="tp">Int</span>) -> <span class="tp">Int</span> {
+    f(f(x))
+}
+
+<span class="kw">fn</span> increment(n: <span class="tp">Int</span>) -> <span class="tp">Int</span> { n <span class="op">+</span> <span class="num">1</span> }
+
+println(apply_twice(increment, <span class="num">5</span>))  <span class="cm">// 7</span></code></pre>
+
+        <div class="book-nav">
+            <a href="types.html">&larr; Types</a>
+            <a href="control-flow.html" class="next">Control Flow &rarr;</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>Midori is free and open source. <a href="https://github.com/midori-lang/midori">Contributions welcome</a>.</p>
+        <p style="margin-top:0.5rem; font-size:0.8rem;">&copy; 2026 The Midori Contributors</p>
+    </footer>
+</body>
+</html>

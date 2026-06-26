@@ -1,0 +1,9 @@
+compiler/target/
+compiler/*.c
+compiler/*.h
+compiler/runtime/*.swp
+midori_runtime.*
+*.o
+*.out
+**/*.swp
+.DS_Store

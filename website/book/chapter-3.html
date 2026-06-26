@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 3 — Basic Syntax | The Midori Programming Language</title>
+    <link rel="stylesheet" href="../styles/midori.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <a href="../" class="logo">
+            <svg class="logo-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="leaf" d="M16 4C12 4 6 8 6 16C6 24 10 28 16 28C18 28 20 27 22 25C20 24 18 22 17 19C16 16 17 12 20 9C22 7 24 5 26 4C24 3 20 2 16 4Z"/>
+                <path class="leaf-accent" d="M16 28C14 28 10 26 9 22C11 23 14 23 16 21C18 19 19 15 20 12C21 10 22 8 24 7C22 9 20 12 19 16C18 20 17 24 16 28Z"/>
+            </svg>
+            <span>midori</span>
+        </a>
+        <div class="nav-links">
+            <a href="../docs/">Docs</a>
+            <a href="../book/">Book</a>
+            <a href="https://github.com/midori-lang/midori">GitHub</a>
+        </div>
+    </nav>
+
+    <div class="content">
+        <h1>Chapter 3: Basic Syntax</h1>
+
+        <h2>Comments</h2>
+        <p>Midori supports two kinds of comments. Line comments start with <code>//</code> and extend to the end of the line. Block comments are enclosed between <code>/*</code> and <code>*/</code> and can span multiple lines. Documentation comments use three slashes <code>///</code> and are used by the documentation generator.</p>
+
+        <pre><code><span class="cm">// This is a line comment</span>
+
+<span class="cm">/* This is a block comment
+   that spans multiple lines */</span>
+
+<span class="cm">/// Documentation comment for the function below</span>
+<span class="kw">fn</span> <span class="fn">greet</span>() { }</code></pre>
+
+        <h2>Literals</h2>
+        <p>Midori provides literals for all primitive types. Integers can be written in decimal, hexadecimal (<code>0x</code>), octal (<code>0o</code>), or binary (<code>0b</code>). Floats support decimal and scientific notation. Strings are enclosed in double quotes and support interpolation with curly braces.</p>
+
+        <pre><code><span class="num">42</span>          <span class="cm">// Int literal (decimal)</span>
+<span class="num">0xFF</span>        <span class="cm">// Int literal (hexadecimal)</span>
+<span class="num">0b1010</span>      <span class="cm">// Int literal (binary)</span>
+<span class="num">3.14</span>        <span class="cm">// Float literal</span>
+<span class="num">1.5e10</span>      <span class="cm">// Float literal (scientific notation)</span>
+<span class="str">"hello"</span>     <span class="cm">// String literal</span>
+<span class="str">"val = {x}"</span> <span class="cm">// String with interpolation</span>
+<span class="tp">true</span>        <span class="cm">// Bool literal</span></code></pre>
+
+        <h2>Operators</h2>
+        <p>Midori supports the usual arithmetic, comparison, and logical operators. Arithmetic operators include <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, and <code>%</code> (modulo). Comparison operators produce a <code>Bool</code> and include <code>==</code>, <code>!=</code>, <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, and <code>&gt;=</code>.</p>
+
+        <p>Logical operators are <code>&amp;&amp;</code> (and), <code>||</code> (or), and <code>!</code> (not). Midori also has a pipe operator <code>|&gt;</code> for chaining function calls, which we will cover in Chapter 6.</p>
+
+        <pre><code><span class="kw">let</span> sum        = <span class="num">10</span> <span class="op">+</span> <span class="num">5</span>    <span class="cm">// 15</span>
+<span class="kw">let</span> divisible  = <span class="num">10</span> <span class="op">%</span> <span class="num">3</span>    <span class="cm">// 1</span>
+<span class="kw">let</span> is_equal   = <span class="str">"a"</span> <span class="op">==</span> <span class="str">"b"</span>  <span class="cm">// false</span>
+<span class="kw">let</span> both_true  = <span class="tp">true</span> <span class="op">&&</span> <span class="tp">false</span>  <span class="cm">// false</span></code></pre>
+
+        <h2>Expressions and Statements</h2>
+        <p>One of Midori's most important design choices: almost everything is an expression. Blocks delimited by braces are expressions that return the value of their last line. This means <code>if</code>, <code>match</code>, and even bare blocks all produce values.</p>
+
+        <pre><code><span class="kw">let</span> message = <span class="kw">if</span> age &gt;= <span class="num">18</span> {
+    <span class="str">"adult"</span>
+} <span class="kw">else</span> {
+    <span class="str">"minor"</span>
+}
+
+<span class="cm">// Blocks as expressions</span>
+<span class="kw">let</span> result = {
+    <span class="kw">let</span> x = <span class="num">5</span>
+    x <span class="op">*</span> <span class="num">2</span>
+}  <span class="cm">// result is 10</span></code></pre>
+
+        <p>Statements are expressions whose result is discarded. Variable bindings with <code>let</code>, function definitions with <code>fn</code>, and expression statements (an expression followed by a newline) are all statements. Midori does not use semicolons &mdash; newlines serve as separators in most cases.</p>
+
+        <pre><code><span class="cm">// This is idiomatic Midori — expression-oriented and clean</span>
+<span class="kw">fn</span> <span class="fn">classify</span>(score: <span class="tp">Int</span>) -> <span class="tp">Str</span> {
+    <span class="kw">if</span> score &gt;= <span class="num">90</span> { <span class="str">"A"</span> }
+    <span class="kw">elif</span> score &gt;= <span class="num">80</span> { <span class="str">"B"</span> }
+    <span class="kw">elif</span> score &gt;= <span class="num">70</span> { <span class="str">"C"</span> }
+    <span class="kw">else</span>              { <span class="str">"D"</span> }
+}</code></pre>
+
+        <div class="book-nav">
+            <a href="chapter-2.html">&larr; Previous: Getting Started</a>
+            <a href="chapter-4.html" class="next">Next: Variables and Bindings &rarr;</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>Midori is free and open source. <a href="https://github.com/midori-lang/midori">Contributions welcome</a>.</p>
+        <p style="margin-top:0.5rem; font-size:0.8rem;">&copy; 2026 The Midori Contributors</p>
+    </footer>
+</body>
+</html>

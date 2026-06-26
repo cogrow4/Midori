@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 4 — Variables and Bindings | The Midori Programming Language</title>
+    <link rel="stylesheet" href="../styles/midori.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <a href="../" class="logo">
+            <svg class="logo-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="leaf" d="M16 4C12 4 6 8 6 16C6 24 10 28 16 28C18 28 20 27 22 25C20 24 18 22 17 19C16 16 17 12 20 9C22 7 24 5 26 4C24 3 20 2 16 4Z"/>
+                <path class="leaf-accent" d="M16 28C14 28 10 26 9 22C11 23 14 23 16 21C18 19 19 15 20 12C21 10 22 8 24 7C22 9 20 12 19 16C18 20 17 24 16 28Z"/>
+            </svg>
+            <span>midori</span>
+        </a>
+        <div class="nav-links">
+            <a href="../docs/">Docs</a>
+            <a href="../book/">Book</a>
+            <a href="https://github.com/midori-lang/midori">GitHub</a>
+        </div>
+    </nav>
+
+    <div class="content">
+        <h1>Chapter 4: Variables and Bindings</h1>
+
+        <h2>let Bindings</h2>
+        <p>Variables in Midori are introduced with the <code>let</code> keyword. By default, every binding is <strong>immutable</strong> &mdash; once a value is assigned, it cannot change. This is a deliberate design choice: immutable data is easier to reason about, safer in concurrent contexts, and enables compiler optimizations.</p>
+
+        <pre><code><span class="kw">let</span> name = <span class="str">"Midori"</span>
+<span class="kw">let</span> year = <span class="num">2026</span>
+
+<span class="cm">// This would cause a compile error:</span>
+<span class="cm">// name = "Something else"</span></code></pre>
+
+        <h2>Mutable Bindings with mut</h2>
+        <p>When you need mutability, add the <code>mut</code> keyword after <code>let</code>. Mutable variables can be reassigned with <code>=</code>. Use mutability sparingly &mdash; prefer immutable bindings unless mutation is clearly the right tool.</p>
+
+        <pre><code><span class="kw">let</span> <span class="kw">mut</span> counter = <span class="num">0</span>
+counter = counter <span class="op">+</span> <span class="num">1</span>     <span class="cm">// OK — counter is mutable</span>
+<span class="fn">println</span>(counter)           <span class="cm">// 1</span></code></pre>
+
+        <h2>Type Inference</h2>
+        <p>Midori has full type inference. You rarely need to write types explicitly &mdash; the compiler deduces them from usage. This gives you the safety of static types with the brevity of dynamic languages.</p>
+
+        <pre><code><span class="kw">let</span> x = <span class="num">42</span>            <span class="cm">// inferred as Int</span>
+<span class="kw">let</span> y = <span class="num">3.14</span>          <span class="cm">// inferred as Float</span>
+<span class="kw">let</span> z = <span class="str">"hello"</span>       <span class="cm">// inferred as Str</span>
+
+<span class="cm">// You can annotate explicitly when needed</span>
+<span class="kw">let</span> n: <span class="tp">Int</span> = <span class="num">42</span></code></pre>
+
+        <h2>Shadowing</h2>
+        <p>Midori allows variable shadowing: you can declare a new variable with the same name as an existing one, and the new binding takes precedence. This is useful for transforming values without creating many distinct names.</p>
+
+        <pre><code><span class="kw">let</span> name = <span class="str">"midori"</span>
+<span class="kw">let</span> name = <span class="fn">uppercase</span>(name)  <span class="cm">// shadows the previous binding</span>
+<span class="fn">println</span>(name)                <span class="cm">// "MIDORI"</span></code></pre>
+
+        <p>Shadowing is different from mutation. With shadowing, you create a new binding &mdash; the old value still exists but is no longer accessible. This lets you change the <em>type</em> of a variable, which mutation cannot do.</p>
+
+        <pre><code><span class="kw">let</span> value = <span class="str">"123"</span>
+<span class="kw">let</span> value: <span class="tp">Int</span> = <span class="fn">parse_int</span>(value)  <span class="cm">// rebind to a different type</span></code></pre>
+
+        <h2>Constants</h2>
+        <p>For values that are truly constant and known at compile time, use <code>const</code>. Constants must be annotated with their type and cannot be shadowed. They are inlined at every use site, making them suitable for configuration values.</p>
+
+        <pre><code><span class="kw">const</span> <span class="tp">Int</span> MAX_RETRIES = <span class="num">3</span>
+<span class="kw">const</span> <span class="tp">Str</span> APP_NAME    = <span class="str">"Midori"</span></code></pre>
+
+        <div class="book-nav">
+            <a href="chapter-3.html">&larr; Previous: Basic Syntax</a>
+            <a href="chapter-5.html" class="next">Next: Types &rarr;</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>Midori is free and open source. <a href="https://github.com/midori-lang/midori">Contributions welcome</a>.</p>
+        <p style="margin-top:0.5rem; font-size:0.8rem;">&copy; 2026 The Midori Contributors</p>
+    </footer>
+</body>
+</html>

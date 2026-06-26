@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Types — Midori</title>
+    <link rel="stylesheet" href="../styles/midori.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <a href="/" class="logo">
+            <svg class="logo-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="leaf" d="M16 4C12 4 6 8 6 16C6 24 10 28 16 28C18 28 20 27 22 25C20 24 18 22 17 19C16 16 17 12 20 9C22 7 24 5 26 4C24 3 20 2 16 4Z"/>
+                <path class="leaf-accent" d="M16 28C14 28 10 26 9 22C11 23 14 23 16 21C18 19 19 15 20 12C21 10 22 8 24 7C22 9 20 12 19 16C18 20 17 24 16 28Z"/>
+            </svg>
+            <span>midori</span>
+        </a>
+        <div class="nav-links">
+            <a href="../docs/">Docs</a>
+            <a href="../book/">Book</a>
+            <a href="https://github.com/midori-lang/midori">GitHub</a>
+        </div>
+    </nav>
+
+    <div class="content">
+        <h1>Types</h1>
+        <p>Midori is a strongly typed language with full type inference. You rarely need to write types explicitly — the compiler can infer them from context.</p>
+
+        <h2>Primitive Types</h2>
+
+        <h3>Int</h3>
+        <p>A 64-bit signed integer:</p>
+        <pre><code><span class="kw">let</span> a: <span class="tp">Int</span> = <span class="num">42</span>
+<span class="kw">let</span> b = <span class="num">-17</span>           <span class="cm">// inferred as Int</span>
+<span class="kw">let</span> hex = <span class="num">0xFF</span>        <span class="cm">// hexadecimal literal</span>
+<span class="kw">let</span> bin = <span class="num">0b1010</span>      <span class="cm">// binary literal</span></code></pre>
+
+        <h3>Float</h3>
+        <p>A 64-bit floating point number:</p>
+        <pre><code><span class="kw">let</span> pi: <span class="tp">Float</span> = <span class="num">3.14159</span>
+<span class="kw">let</span> e = <span class="num">2.71828</span>        <span class="cm">// inferred as Float</span>
+<span class="kw">let</span> sci = <span class="num">1.5e10</span>      <span class="cm">// scientific notation</span></code></pre>
+
+        <h3>Bool</h3>
+        <p>A boolean value, either <code>true</code> or <code>false</code>:</p>
+        <pre><code><span class="kw">let</span> is_ready: <span class="tp">Bool</span> = <span class="kw">true</span>
+<span class="kw">let</span> done = <span class="kw">false</span>        <span class="cm">// inferred as Bool</span></code></pre>
+
+        <h3>Str</h3>
+        <p>A UTF-8 string with interpolation support:</p>
+        <pre><code><span class="kw">let</span> name = <span class="str">"Midori"</span>
+<span class="kw">let</span> greeting = <span class="str">"Hello, {name}!"</span>  <span class="cm">// "Hello, Midori!"</span>
+
+<span class="cm">// Multi-line strings</span>
+<span class="kw">let</span> poem = <span class="str">"Roses are red,
+Violets are blue,
+Midori is fresh,
+And so are you."</span></code></pre>
+
+        <h3>Char</h3>
+        <p>A single Unicode character:</p>
+        <pre><code><span class="kw">let</span> letter: <span class="tp">Char</span> = <span class="str">'A'</span>
+<span class="kw">let</span> emoji = <span class="str">'🍃'</span></code></pre>
+
+        <h2>Generic Types</h2>
+
+        <h3>Option[T]</h3>
+        <p>Represents a value that may or may not be present. Eliminates null pointer exceptions:</p>
+        <pre><code><span class="kw">let</span> some_value: <span class="tp">Option</span>[<span class="tp">Int</span>] = <span class="tp">Some</span>(<span class="num">42</span>)
+<span class="kw">let</span> no_value: <span class="tp">Option</span>[<span class="tp">Int</span>] = <span class="tp">None</span>
+
+<span class="cm">// Pattern matching on Option</span>
+<span class="kw">match</span> some_value {
+    <span class="tp">Some</span>(val) => println(<span class="str">"Got {val}"</span>),
+    <span class="tp">None</span> => println(<span class="str">"No value"</span>),
+}</code></pre>
+
+        <h3>Result[T, E]</h3>
+        <p>Represents either a success value or an error. Enforces error handling at the type level:</p>
+        <pre><code><span class="kw">fn</span> divide(a: <span class="tp">Int</span>, b: <span class="tp">Int</span>) -> <span class="tp">Result</span>[<span class="tp">Int</span>, <span class="tp">Str</span>] {
+    <span class="kw">if</span> b <span class="op">==</span> <span class="num">0</span> {
+        <span class="tp">Err</span>(<span class="str">"division by zero"</span>)
+    } <span class="kw">else</span> {
+        <span class="tp">Ok</span>(a <span class="op">/</span> b)
+    }
+}
+
+<span class="kw">let</span> result = divide(<span class="num">10</span>, <span class="num">2</span>)
+<span class="kw">match</span> result {
+    <span class="tp">Ok</span>(val) => println(<span class="str">"Result: {val}"</span>),
+    <span class="tp">Err</span>(msg) => println(<span class="str">"Error: {msg}"</span>),
+}</code></pre>
+
+        <h2>Type Annotations</h2>
+        <p>While Midori infers types, you can annotate them explicitly for clarity or when the compiler needs help:</p>
+        <pre><code><span class="kw">fn</span> add(x: <span class="tp">Int</span>, y: <span class="tp">Int</span>) -> <span class="tp">Int</span> {
+    x <span class="op">+</span> y
+}
+
+<span class="kw">let</span> items: <span class="tp">List</span>[<span class="tp">Str</span>] = <span class="tp">List</span>.new()
+<span class="kw">let</span> pair: (<span class="tp">Str</span>, <span class="tp">Int</span>) = (<span class="str">"age"</span>, <span class="num">30</span>)</code></pre>
+
+        <h2>Type Inference</h2>
+        <p>The compiler deduces types from how values are used:</p>
+        <pre><code><span class="kw">let</span> x = <span class="num">42</span>               <span class="cm">// x is Int</span>
+<span class="kw">let</span> y = <span class="num">3.14</span>              <span class="cm">// y is Float</span>
+<span class="kw">let</span> z = x <span class="op">+</span> to_int(y)      <span class="cm">// z is Int (y converted)</span>
+
+<span class="cm">// Generic functions infer their type parameters</span>
+<span class="kw">fn</span> identity[T](val: <span class="tp">T</span>) -> <span class="tp">T</span> { val }
+<span class="kw">let</span> n = identity(<span class="num">42</span>)      <span class="cm">// n is Int</span>
+<span class="kw">let</span> s = identity(<span class="str">"hi"</span>)    <span class="cm">// s is Str</span></code></pre>
+
+        <h2>Custom Types with <code>type</code></h2>
+        <p>Define your own types using the <code>type</code> keyword. See the <a href="structs.html">Custom Types</a> page for details.</p>
+
+        <div class="book-nav">
+            <a href="syntax.html">&larr; Syntax</a>
+            <a href="functions.html" class="next">Functions &rarr;</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>Midori is free and open source. <a href="https://github.com/midori-lang/midori">Contributions welcome</a>.</p>
+        <p style="margin-top:0.5rem; font-size:0.8rem;">&copy; 2026 The Midori Contributors</p>
+    </footer>
+</body>
+</html>

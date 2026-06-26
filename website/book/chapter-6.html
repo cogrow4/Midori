@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 6 — Functions | The Midori Programming Language</title>
+    <link rel="stylesheet" href="../styles/midori.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <a href="../" class="logo">
+            <svg class="logo-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="leaf" d="M16 4C12 4 6 8 6 16C6 24 10 28 16 28C18 28 20 27 22 25C20 24 18 22 17 19C16 16 17 12 20 9C22 7 24 5 26 4C24 3 20 2 16 4Z"/>
+                <path class="leaf-accent" d="M16 28C14 28 10 26 9 22C11 23 14 23 16 21C18 19 19 15 20 12C21 10 22 8 24 7C22 9 20 12 19 16C18 20 17 24 16 28Z"/>
+            </svg>
+            <span>midori</span>
+        </a>
+        <div class="nav-links">
+            <a href="../docs/">Docs</a>
+            <a href="../book/">Book</a>
+            <a href="https://github.com/midori-lang/midori">GitHub</a>
+        </div>
+    </nav>
+
+    <div class="content">
+        <h1>Chapter 6: Functions</h1>
+
+        <h2>Function Definitions</h2>
+        <p>Functions are defined with the <code>fn</code> keyword. The function name, parameters, optional return type, and body form the complete definition. Midori uses <code>-></code> to separate parameters from the return type.</p>
+
+        <pre><code><span class="kw">fn</span> <span class="fn">greet</span>(name: <span class="tp">Str</span>) -> <span class="tp">Str</span> {
+    <span class="str">"Hello, {name}!"</span>
+}
+
+<span class="kw">fn</span> <span class="fn">main</span>() {
+    <span class="fn">println</span>(<span class="fn">greet</span>(<span class="str">"World"</span>))
+}</code></pre>
+
+        <h2>Parameters and Return Types</h2>
+        <p>Each parameter has a name followed by a colon and its type. If a function returns nothing, the return type and arrow can be omitted &mdash; it implicitly returns <code>Unit</code>. You can also define default parameter values.</p>
+
+        <pre><code><span class="kw">fn</span> <span class="fn">power</span>(base: <span class="tp">Int</span>, exp: <span class="tp">Int</span> = <span class="num">2</span>) -> <span class="tp">Int</span> {
+    <span class="kw">if</span> exp == <span class="num">0</span> { <span class="num">1</span> }
+    <span class="kw">else</span> { base <span class="op">*</span> <span class="fn">power</span>(base, exp <span class="op">-</span> <span class="num">1</span>) }
+}
+
+<span class="fn">power</span>(<span class="num">3</span>)     <span class="cm">// 9, uses default exp=2</span>
+<span class="fn">power</span>(<span class="num">3</span>, <span class="num">3</span>)  <span class="cm">// 27</span></code></pre>
+
+        <h2>Implicit Returns</h2>
+        <p>Because blocks are expressions, the last expression in a function body is automatically its return value. There is no <code>return</code> keyword &mdash; simply let the final expression speak. For early exits, a bare expression works the same way.</p>
+
+        <pre><code><span class="kw">fn</span> <span class="fn">factorial</span>(n: <span class="tp">Int</span>) -> <span class="tp">Int</span> {
+    <span class="kw">if</span> n &lt;= <span class="num">1</span> { <span class="num">1</span> }
+    <span class="kw">else</span> { n <span class="op">*</span> <span class="fn">factorial</span>(n <span class="op">-</span> <span class="num">1</span>) }
+}</code></pre>
+
+        <h2>Closures</h2>
+        <p>Closures &mdash; anonymous functions that capture their environment &mdash; are defined with the same <code>fn</code> syntax but without a name. They can be assigned to variables, passed as arguments, and returned from functions. Closures can capture variables by reference or by value.</p>
+
+        <pre><code><span class="kw">let</span> multiplier = <span class="kw">fn</span>(x: <span class="tp">Int</span>) { x <span class="op">*</span> <span class="num">2</span> }
+<span class="fn">println</span>(<span class="fn">multiplier</span>(<span class="num">5</span>))  <span class="cm">// 10
+
+// Capturing environment</span>
+<span class="kw">let</span> offset = <span class="num">10</span>
+<span class="kw">let</span> add_offset = <span class="kw">fn</span>(x: <span class="tp">Int</span>) { x <span class="op">+</span> offset }
+<span class="fn">println</span>(<span class="fn">add_offset</span>(<span class="num">3</span>))  <span class="cm">// 13</span></code></pre>
+
+        <h2>Pipe Operator</h2>
+        <p>The pipe operator <code>|&gt;</code> passes a value as the argument to a function, making chains of transformations read naturally from left to right. This is especially useful for data processing pipelines.</p>
+
+        <pre><code><span class="kw">let</span> result = <span class="str">"hello world"</span>
+    |&gt; <span class="fn">uppercase</span>
+    |&gt; <span class="fn">split</span>(<span class="str">" "</span>)
+    |&gt; <span class="fn">first</span>
+
+<span class="cm">// Equivalent to: first(split(uppercase("hello world"), " "))</span>
+
+<span class="kw">let</span> nums = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>]
+<span class="kw">let</span> sum_of_squares = nums
+    |&gt; <span class="fn">filter</span>(<span class="kw">fn</span>(x) { x <span class="op">%</span> <span class="num">2</span> == <span class="num">0</span> })
+    |&gt; <span class="fn">map</span>(<span class="kw">fn</span>(x) { x <span class="op">*</span> x })
+    |&gt; <span class="fn">sum</span></code></pre>
+
+        <div class="book-nav">
+            <a href="chapter-5.html">&larr; Previous: Types</a>
+            <a href="chapter-7.html" class="next">Next: Control Flow &rarr;</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>Midori is free and open source. <a href="https://github.com/midori-lang/midori">Contributions welcome</a>.</p>
+        <p style="margin-top:0.5rem; font-size:0.8rem;">&copy; 2026 The Midori Contributors</p>
+    </footer>
+</body>
+</html>
