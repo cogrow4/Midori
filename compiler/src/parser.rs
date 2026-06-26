@@ -781,12 +781,13 @@ impl Parser {
                 while !self.check(&Token::RBrace) && !self.check(&Token::Eof) {
                     arms.push(self.parse_match_arm()?);
                     self.skip_newlines();
+                    self.eat(&Token::Comma);
+                    self.skip_newlines();
                 }
                 self.expect(Token::RBrace)?;
                 Ok(Expr::Match(Box::new(expr), arms))
             }
 
-            // Identifier or type constructor
             Token::Ident(s) => {
                 // Check for struct literal: Person { name: "Midori", age: 1 }
                 if self.check(&Token::LBrace) && !self.check(&Token::Eof)

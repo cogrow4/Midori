@@ -135,7 +135,7 @@ static inline mi_str   str(mi_int n)       { return mi_to_string(n); }
 static inline mi_int   len(mi_array arr)  { return mi_array_len(&arr); }
 static inline mi_int   len_str(mi_str s)   { return s.len; }
 static inline mi_str   str_bool(mi_bool b) { return mi_bool_to_string(b); }
-static inline mi_str   str_char(mi_char c)   { char buf[2] = {c, 0}; return mi_str_lit(buf); }
+static inline mi_str   str_char(mi_char c)   { char buf[2] = {c, 0}; return mi_str_new(buf); }
 static inline mi_str   str_float(mi_float f) { return mi_float_to_string(f); }
 static inline mi_float pi(void)    { return mi_pi(); }
 static inline mi_float e(void)     { return mi_e(); }

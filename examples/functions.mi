@@ -1,9 +1,7 @@
-fn greet(name: Str) -> Str {
-    let result = "Hello, "
-    result
+fn add(a: Int, b: Int) -> Int {
+    a + b
 }
 
 fn main() {
-    let message = greet("Midori")
-    println(message)
+    println(str(add(8, 12)))
 }

@@ -286,6 +286,7 @@ impl<'a> Lexer<'a> {
                 '%' => Ok(Token::Percent),
                 '=' => {
                     if self.peek() == Some('=') { self.advance(); Ok(Token::EqEq) }
+                    else if self.peek() == Some('>') { self.advance(); Ok(Token::FatArrow) }
                     else { Ok(Token::Eq) }
                 }
                 '!' => {

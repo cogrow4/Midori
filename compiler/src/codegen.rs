@@ -201,6 +201,7 @@ impl Codegen {
                     "mi_int".to_string()
                 }
             }
+            Expr::Array(_) => "mi_array".to_string(),
             Expr::StructLit(name, _) => name.clone(),
             _ => "mi_int".to_string()
         }
@@ -379,7 +380,9 @@ impl Codegen {
                         self.emit_line(&format!("mi_int {}_data[] = {{}};", arr_var));
                         self.emit_line(&format!("mi_array {} = mi_array_new(sizeof(mi_int), {});", arr_var, items.len()));
                         for (i, val) in items_s.iter().enumerate() {
-                            self.emit_line(&format!("mi_array_set(&{}, {}, &({}));", arr_var, i, val));
+                            let tv = self.fresh_var("_tv");
+                            self.emit_line(&format!("mi_int {} = {};", tv, val));
+                            self.emit_line(&format!("mi_array_set(&{}, {}, &{});", arr_var, i, tv));
                         }
                         self.emit_line(&format!("for (mi_int {} = 0; {} < {}.len; {}++) {{", iv, iv, arr_var, iv));
                         self.indent += 1;
@@ -455,7 +458,6 @@ impl Codegen {
             Stmt::Empty => {}
         }
     }
-
     fn gen_block_body(&mut self, body: &Expr, needs_return: bool) {
         match body {
             Expr::Block(stmts) => {
@@ -463,23 +465,12 @@ impl Codegen {
                 for (i, s) in stmts.iter().enumerate() {
                     if i == len - 1 && needs_return {
                         if let Stmt::Expr(e) = s {
-                            match e {
-                                Expr::Call(..) | Expr::MethodCall(..) => {
-                                    let v = self.gen_expr(e);
-                                    self.emit_line(&format!("{};", v));
-                                }
-                                _ => {
-                                    let v = self.gen_expr(e);
-                                    self.emit_line(&format!("return {};", v));
-                                }
-                            }
+                            let v = self.gen_expr(e);
+                            self.emit_line(&format!("return {};", v));
                         } else if let Stmt::If(cond, then_body, else_body) = s {
-                            // Statement-level if as last expression: add return
                             let cc = self.expr_as_condition(cond);
                             self.emit_line(&format!("if ({}) {{", cc));
                             self.indent += 1;
-                            // The then_body is a block - its last expression should return
-                            // Convert then_body to expression block if single expr
                             if then_body.len() == 1 {
                                 if let Stmt::Expr(e) = &then_body[0] {
                                     let v = self.gen_expr(e);
@@ -557,6 +548,14 @@ impl Codegen {
                     self.emit_line(&format!("return {};", rv));
                 }
             }
+            Expr::Call(..) | Expr::MethodCall(..) => {
+                let v = self.gen_expr(body);
+                if needs_return {
+                    self.emit_line(&format!("return {};", v));
+                } else {
+                    self.emit_line(&format!("{};", v));
+                }
+            }
             _ => {
                 if needs_return {
                     let v = self.gen_expr(body);
@@ -565,8 +564,8 @@ impl Codegen {
                     let v = self.gen_expr(body);
                     self.emit_line(&format!("{};", v));
                 }
+            }
         }
-    }
     }
     fn gen_expr(&mut self, expr: &Expr) -> String {
         match expr {
@@ -585,6 +584,9 @@ impl Codegen {
                     let mut result = prefix;
                     for expr in interps {
                         let val = self.gen_expr(expr);
+                        // ponytail: wrap non-string expressions with str()
+                        let ct = self.infer_ctype(expr);
+                        let val = if ct == "mi_str" { val } else { format!("str({})", val) };
                         result = format!("mi_str_concat({}, {})", result, val);
                     }
                     result
@@ -614,9 +616,9 @@ impl Codegen {
                     Expr::Str(s, _) => {
                         if let Expr::Int(n) = idx.as_ref() {
                             let c = s.as_bytes().get(*n as usize).copied().unwrap_or(0);
-                            format!("((mi_int){}i)", c)
+                            format!("((mi_char){})", c)
                         } else {
-                            format!("(mi_int)(mi_str_lit(\"{}\").data[{}])", s, i)
+                            format!("(mi_char)(mi_str_lit(\"{}\").data[{}])", s.replace('"', "\\\"").replace('\n', "\\n"), i)
                         }
                     }
                     _ if is_array => {
@@ -632,7 +634,6 @@ impl Codegen {
             Expr::Call(callee, args) => {
                 let callee_str = self.gen_expr(callee);
                 let args_s: Vec<String> = args.iter().map(|a| self.gen_expr(a)).collect();
-                // Translate math function names to mi_ prefixed C runtime names
                 let fn_name = match callee.as_ref() {
                     Expr::Ident(n) => match n.as_str() {
                         "sin" | "cos" | "tan" | "sqrt" | "pow" | "exp" | "log" | "log10"
@@ -785,7 +786,9 @@ impl Codegen {
                     self.emit_line(&format!("mi_int {}_data[] = {{}};", elem_var));
                     self.emit_line(&format!("mi_array {} = mi_array_new(sizeof({}), {});", elem_var, elem_type, items.len()));
                     for (i, val) in items_s.iter().enumerate() {
-                        self.emit_line(&format!("mi_array_set(&{}, {}, &({}));", elem_var, i, val));
+                        let tv = self.fresh_var("_tv");
+                        self.emit_line(&format!("mi_int {} = {};", tv, val));
+                        self.emit_line(&format!("mi_array_set(&{}, {}, &{});", elem_var, i, tv));
                     }
                     elem_var
                 }

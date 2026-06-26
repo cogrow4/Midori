@@ -21,7 +21,10 @@ mi_str mi_str_empty(void) {
 }
 
 mi_str mi_str_new(const char* s) {
-    return mi_str_lit(s);
+    mi_int len = (mi_int)strlen(s);
+    char* data = (char*)malloc((size_t)(len + 1));
+    memcpy(data, s, (size_t)(len + 1));
+    return (mi_str){ data, len, len };
 }
 
 mi_str mi_str_from(char* data, mi_int len, mi_int cap) {
