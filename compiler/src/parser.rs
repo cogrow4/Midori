@@ -4,19 +4,21 @@ use crate::lexer::{Lexer, Token};
 pub struct Parser {
     tokens: Vec<(Token, usize, usize)>,
     pos: usize,
+    source: Vec<String>,  // source lines for error reporting
 }
 
 impl Parser {
-    pub fn new(mut lexer: Lexer) -> Result<Self, String> {
+    pub fn new(mut lexer: Lexer, source: &str) -> Result<Self, String> {
         let tokens = lexer.tokenize()?;
-        Ok(Parser { tokens, pos: 0 })
+        let source_lines: Vec<String> = source.lines().map(|l| l.to_string()).collect();
+        Ok(Parser { tokens, pos: 0, source: source_lines })
     }
 
-    /// Parse an expression from a string snippet (used for string interpolation).
     fn parse_expr_str(&self, text: &str) -> Result<Expr, String> {
         let mut lexer = Lexer::new(text);
         let tokens = lexer.tokenize()?;
-        let mut p = Parser { tokens, pos: 0 };
+        let source_lines: Vec<String> = text.lines().map(|l| l.to_string()).collect();
+        let mut p = Parser { tokens, pos: 0, source: source_lines };
         p.parse_expr()
     }
 
@@ -38,11 +40,19 @@ impl Parser {
         t
     }
 
+    fn err(&self, msg: &str, line: usize, col: usize) -> String {
+        let line_idx = if line > 0 { line - 1 } else { 0 };
+        let source_line = self.source.get(line_idx).map(|s| s.as_str()).unwrap_or("");
+        let caret_col = if col > 0 { col - 1 } else { 0 };
+        let caret = format!("{:indent$}^^^ here", "", indent = caret_col);
+        format!("error at {}:{}\n  {}\n  {}\n  {}", line, col, source_line, caret, msg)
+    }
+
     fn expect(&mut self, tok: Token) -> Result<(), String> {
         let line = self.tokens[self.pos].1;
         let col = self.tokens[self.pos].2;
         if self.peek() != &tok {
-            return Err(format!("expected {:?}, got {:?} at {}:{}", tok, self.peek(), line, col));
+            return Err(self.err(&format!("expected {:?}, got {:?}", tok, self.peek()), line, col));
         }
         self.advance();
         Ok(())
@@ -103,7 +113,7 @@ impl Parser {
                 self.advance(); // consume pub
                 match self.peek() {
                     Token::Fn => self.parse_fn(true),
-                    _ => Err(format!("expected fn after pub at {}:{}", self.line(), self.col())),
+                    _ => Err(self.err("expected fn after pub", self.tokens[self.pos].1, self.tokens[self.pos].2)),
                 }
             }
             Token::Fn => self.parse_fn(false),
@@ -828,9 +838,8 @@ impl Parser {
                 Ok(Expr::Import(path, alias))
             }
 
-            Token::Eof => Err("unexpected end of file".to_string()),
-            t => Err(format!("unexpected token {:?} at {}:{}", t, self.line(), self.col())),
-        }
+            t => Err(self.err(&format!("unexpected token {:?}", t), self.tokens[self.pos].1, self.tokens[self.pos].2)),
+    }
     }
 
     fn parse_fn_param_in_parens(&mut self, name: String) -> Result<FnParam, String> {

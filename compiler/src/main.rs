@@ -100,7 +100,7 @@ fn compile(input_file: &str, run: bool, binary_args: &[String]) {
     };
 
     let lex = lexer::Lexer::new(&source);
-    let mut parser = match parser::Parser::new(lex) {
+    let mut parser = match parser::Parser::new(lex, &source) {
         Ok(p) => p,
         Err(e) => {
             eprintln!("error: {}", e);
@@ -117,7 +117,7 @@ fn compile(input_file: &str, run: bool, binary_args: &[String]) {
     };
 
     // Type check
-    let mut checker = types::TypeChecker::new();
+    let mut checker = types::TypeChecker::with_source(&source);
     if let Err(e) = checker.check_program(&program) {
         eprintln!("error: {}", e);
         std::process::exit(1);

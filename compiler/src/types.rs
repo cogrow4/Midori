@@ -20,64 +20,64 @@ pub enum MiType {
 }
 
 pub struct TypeChecker {
-    pub globals: HashMap<String, (MiType, bool)>, // name -> (type, mutable)
+    pub globals: HashMap<String, (MiType, bool)>,
     pub functions: HashMap<String, MiType>,
     pub types: HashMap<String, MiType>,
-    methods: HashMap<String, HashMap<String, MiType>>, // type_name -> {method_name -> Fn type}
+    methods: HashMap<String, HashMap<String, MiType>>,
     locals: Vec<HashMap<String, (MiType, bool)>>,
     errors: Vec<String>,
+    source: Vec<String>,  // source lines for error context
 }
 
 impl TypeChecker {
     pub fn new() -> Self {
-        let mut globals = HashMap::new();
-        // Built-in functions
-        globals.insert("print".to_string(), (MiType::Fn(vec![MiType::Str], Box::new(MiType::Nil)), false));
-        globals.insert("println".to_string(), (MiType::Fn(vec![MiType::Str], Box::new(MiType::Nil)), false));
-        globals.insert("len".to_string(), (MiType::Fn(vec![MiType::Array(Box::new(MiType::Unknown))], Box::new(MiType::Int)), false));
-        globals.insert("str".to_string(), (MiType::Fn(vec![MiType::Int], Box::new(MiType::Str)), false));
-        globals.insert("int".to_string(), (MiType::Fn(vec![MiType::Str], Box::new(MiType::Int)), false));
-        globals.insert("len_str".to_string(), (MiType::Fn(vec![MiType::Str], Box::new(MiType::Int)), false));
-        globals.insert("range".to_string(), (MiType::Fn(vec![MiType::Int], Box::new(MiType::Array(Box::new(MiType::Int)))), false));
-        // Math library
-        globals.insert("pi".to_string(), (MiType::Fn(vec![], Box::new(MiType::Float)), false));
-        globals.insert("e".to_string(), (MiType::Fn(vec![], Box::new(MiType::Float)), false));
-        globals.insert("sin".to_string(), (MiType::Fn(vec![MiType::Float], Box::new(MiType::Float)), false));
-        globals.insert("cos".to_string(), (MiType::Fn(vec![MiType::Float], Box::new(MiType::Float)), false));
-        globals.insert("tan".to_string(), (MiType::Fn(vec![MiType::Float], Box::new(MiType::Float)), false));
-        globals.insert("sqrt".to_string(), (MiType::Fn(vec![MiType::Float], Box::new(MiType::Float)), false));
-        globals.insert("pow".to_string(), (MiType::Fn(vec![MiType::Float, MiType::Float], Box::new(MiType::Float)), false));
-        globals.insert("exp".to_string(), (MiType::Fn(vec![MiType::Float], Box::new(MiType::Float)), false));
-        globals.insert("log".to_string(), (MiType::Fn(vec![MiType::Float], Box::new(MiType::Float)), false));
-        globals.insert("log10".to_string(), (MiType::Fn(vec![MiType::Float], Box::new(MiType::Float)), false));
-        globals.insert("abs".to_string(), (MiType::Fn(vec![MiType::Float], Box::new(MiType::Float)), false));
-        globals.insert("floor".to_string(), (MiType::Fn(vec![MiType::Float], Box::new(MiType::Float)), false));
-        globals.insert("ceil".to_string(), (MiType::Fn(vec![MiType::Float], Box::new(MiType::Float)), false));
-        globals.insert("round".to_string(), (MiType::Fn(vec![MiType::Float], Box::new(MiType::Float)), false));
-        globals.insert("atan2".to_string(), (MiType::Fn(vec![MiType::Float, MiType::Float], Box::new(MiType::Float)), false));
-        // File I/O
-        globals.insert("read_file".to_string(), (MiType::Fn(vec![MiType::Str], Box::new(MiType::Str)), false));
-        globals.insert("write_file".to_string(), (MiType::Fn(vec![MiType::Str, MiType::Str], Box::new(MiType::Bool)), false));
-        globals.insert("file_exists".to_string(), (MiType::Fn(vec![MiType::Str], Box::new(MiType::Bool)), false));
-        // String builder
-        globals.insert("sb_new".to_string(), (MiType::Fn(vec![], Box::new(MiType::Unknown)), false));
-        globals.insert("sb_append".to_string(), (MiType::Fn(vec![MiType::Unknown, MiType::Str], Box::new(MiType::Nil)), false));
-        globals.insert("sb_build".to_string(), (MiType::Fn(vec![MiType::Unknown], Box::new(MiType::Str)), false));
-        // CLI args
-        globals.insert("os_args".to_string(), (MiType::Fn(vec![], Box::new(MiType::Array(Box::new(MiType::Str)))), false));
-
-        // String conversions
-        globals.insert("str_bool".to_string(), (MiType::Fn(vec![MiType::Bool], Box::new(MiType::Str)), false));
-        globals.insert("str_float".to_string(), (MiType::Fn(vec![MiType::Float], Box::new(MiType::Str)), false));
-        globals.insert("str_char".to_string(), (MiType::Fn(vec![MiType::Char], Box::new(MiType::Str)), false));
-        TypeChecker {
-            globals,
+        TypeChecker::with_source("")
+    }
+    pub fn with_source(source: &str) -> Self {
+        let source_lines: Vec<String> = source.lines().map(|l| l.to_string()).collect();
+        let mut tc = TypeChecker {
+            globals: HashMap::new(),
             functions: HashMap::new(),
             types: HashMap::new(),
             methods: HashMap::new(),
             locals: vec![HashMap::new()],
             errors: Vec::new(),
-        }
+            source: source_lines,
+        };
+        // Built-in functions
+        tc.globals.insert("print".to_string(), (MiType::Fn(vec![MiType::Str], Box::new(MiType::Nil)), false));
+        tc.globals.insert("println".to_string(), (MiType::Fn(vec![MiType::Str], Box::new(MiType::Nil)), false));
+        tc.globals.insert("len".to_string(), (MiType::Fn(vec![MiType::Array(Box::new(MiType::Unknown))], Box::new(MiType::Int)), false));
+        tc.globals.insert("str".to_string(), (MiType::Fn(vec![MiType::Int], Box::new(MiType::Str)), false));
+        tc.globals.insert("int".to_string(), (MiType::Fn(vec![MiType::Str], Box::new(MiType::Int)), false));
+        tc.globals.insert("len_str".to_string(), (MiType::Fn(vec![MiType::Str], Box::new(MiType::Int)), false));
+        tc.globals.insert("range".to_string(), (MiType::Fn(vec![MiType::Int], Box::new(MiType::Array(Box::new(MiType::Int)))), false));
+        tc.globals.insert("pi".to_string(), (MiType::Fn(vec![], Box::new(MiType::Float)), false));
+        tc.globals.insert("e".to_string(), (MiType::Fn(vec![], Box::new(MiType::Float)), false));
+        tc.globals.insert("sin".to_string(), (MiType::Fn(vec![MiType::Float], Box::new(MiType::Float)), false));
+        tc.globals.insert("cos".to_string(), (MiType::Fn(vec![MiType::Float], Box::new(MiType::Float)), false));
+        tc.globals.insert("tan".to_string(), (MiType::Fn(vec![MiType::Float], Box::new(MiType::Float)), false));
+        tc.globals.insert("sqrt".to_string(), (MiType::Fn(vec![MiType::Float], Box::new(MiType::Float)), false));
+        tc.globals.insert("pow".to_string(), (MiType::Fn(vec![MiType::Float, MiType::Float], Box::new(MiType::Float)), false));
+        tc.globals.insert("exp".to_string(), (MiType::Fn(vec![MiType::Float], Box::new(MiType::Float)), false));
+        tc.globals.insert("log".to_string(), (MiType::Fn(vec![MiType::Float], Box::new(MiType::Float)), false));
+        tc.globals.insert("log10".to_string(), (MiType::Fn(vec![MiType::Float], Box::new(MiType::Float)), false));
+        tc.globals.insert("abs".to_string(), (MiType::Fn(vec![MiType::Float], Box::new(MiType::Float)), false));
+        tc.globals.insert("floor".to_string(), (MiType::Fn(vec![MiType::Float], Box::new(MiType::Float)), false));
+        tc.globals.insert("ceil".to_string(), (MiType::Fn(vec![MiType::Float], Box::new(MiType::Float)), false));
+        tc.globals.insert("round".to_string(), (MiType::Fn(vec![MiType::Float], Box::new(MiType::Float)), false));
+        tc.globals.insert("atan2".to_string(), (MiType::Fn(vec![MiType::Float, MiType::Float], Box::new(MiType::Float)), false));
+        tc.globals.insert("read_file".to_string(), (MiType::Fn(vec![MiType::Str], Box::new(MiType::Str)), false));
+        tc.globals.insert("write_file".to_string(), (MiType::Fn(vec![MiType::Str, MiType::Str], Box::new(MiType::Bool)), false));
+        tc.globals.insert("file_exists".to_string(), (MiType::Fn(vec![MiType::Str], Box::new(MiType::Bool)), false));
+        tc.globals.insert("sb_new".to_string(), (MiType::Fn(vec![], Box::new(MiType::Unknown)), false));
+        tc.globals.insert("sb_append".to_string(), (MiType::Fn(vec![MiType::Unknown, MiType::Str], Box::new(MiType::Nil)), false));
+        tc.globals.insert("sb_build".to_string(), (MiType::Fn(vec![MiType::Unknown], Box::new(MiType::Str)), false));
+        tc.globals.insert("os_args".to_string(), (MiType::Fn(vec![], Box::new(MiType::Array(Box::new(MiType::Str)))), false));
+        tc.globals.insert("str_bool".to_string(), (MiType::Fn(vec![MiType::Bool], Box::new(MiType::Str)), false));
+        tc.globals.insert("str_float".to_string(), (MiType::Fn(vec![MiType::Float], Box::new(MiType::Str)), false));
+        tc.globals.insert("str_char".to_string(), (MiType::Fn(vec![MiType::Char], Box::new(MiType::Str)), false));
+        tc
     }
 
     pub fn check_program(&mut self, program: &Program) -> Result<(), String> {
@@ -1007,13 +1007,12 @@ impl TypeChecker {
             _ => false,
         }
     }
-
     fn err(&self, msg: &str, line: usize, col: usize) -> String {
-        if line == 0 && col == 0 {
-            msg.to_string()
-        } else {
-            format!("{} at {}:{}", msg, line, col)
-        }
+        let line_idx = if line > 0 { line - 1 } else { 0 };
+        let source_line = self.source.get(line_idx).map(|s| s.as_str()).unwrap_or("");
+        let caret_col = if col > 0 { col - 1 } else { 0 };
+        let caret = format!("{:indent$}^^^ here", "", indent = caret_col);
+        format!("error at {}:{}\n  {}\n  {}\n  {}", line, col, source_line, caret, msg)
     }
 }
 
