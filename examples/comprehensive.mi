@@ -1,3 +1,4 @@
+// midori
 // Test all Midori features
 
 fn greet(name: Str) -> Str {
@@ -18,20 +19,18 @@ fn fib(n: Int) -> Int {
     }
 }
 
-fn main() {
-    // Print with both names
-    print("=== Midori Tests ===")
-    
-    // String operations
-    let msg: Str = greet("Midori")
-    println(msg)
-    
-    // Fibonacci (recursion, arithmetic)
-    let result: Int = fib(20)
-    let s: Str = str(result)
-    println(s)
-    
-    // String + string concatenation
-    let combined: Str = "Hello, " + "world!"
-    println(combined)
-}
+// Print with both names
+print("=== Midori Tests ===")
+
+// String operations
+let msg: Str = greet("Midori")
+println(msg)
+
+// Fibonacci (recursion, arithmetic)
+let result: Int = fib(20)
+let s: Str = str(result)
+println(s)
+
+// String + string concatenation
+let combined: Str = "Hello, " + "world!"
+println(combined)

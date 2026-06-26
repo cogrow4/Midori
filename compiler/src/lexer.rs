@@ -4,12 +4,10 @@ use std::str::Chars;
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token {
     // Keywords
-    Fn, Let, Mut, If, Else, Elif, Match, For, While, Loop,
+    Fn, Func, Let, Mut, If, Else, Elif, Match, For, While, Loop,
     Break, Continue, Return, Type, Trait, Impl, Pub,
     Import, As, Var, Extern, True, False, Nil, In, And, Or, Not,
     Where, MutKw, Self_,
-
-    // Literals
     IntLiteral(i64),
     FloatLiteral(f64),
     StrLiteral(String),
@@ -202,6 +200,7 @@ impl<'a> Lexer<'a> {
         }
         match s.as_str() {
             "fn" => Token::Fn,
+            "func" => Token::Func,
             "let" => Token::Let,
             "mut" => Token::MutKw,
             "if" => Token::If,

@@ -1,7 +1,6 @@
-fn add(a: Int, b: Int) -> Int {
+// midori
+func add(a: Int, b: Int) -> Int {
     a + b
 }
 
-fn main() {
-    println(str(add(8, 12)))
-}
+println(str(add(8, 12)))

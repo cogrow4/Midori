@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 1 — Introduction | The Midori Programming Language</title>
+    <title>Chapter 1: Introduction — Midori Book</title>
     <link rel="stylesheet" href="../styles/midori.css">
 </head>
 <body>
@@ -26,56 +26,36 @@
         <h1>Chapter 1: Introduction</h1>
 
         <h2>What is Midori?</h2>
-        <p>Midori is a compiled programming language designed from the ground up for developer joy. It combines the expressiveness of modern functional languages with the performance of systems languages, all wrapped in a syntax that feels familiar yet fresh. The name <em>Midori</em> &mdash; Japanese for "green" &mdash; reflects the project's commitment to sustainability: sustainable code, sustainable tooling, and a sustainable open-source community.</p>
+        <p>Midori is a compiled programming language built from scratch in Rust. It features Python-inspired syntax with C-style braces, type inference, string interpolation, pattern matching, and method dispatch. Midori compiles through C to native code via Clang or GCC.</p>
 
-        <p>Midori compiles through C to native machine code, which means it runs everywhere C runs. The compiler is self-hosting &mdash; written in Midori itself &mdash; and produces efficient binaries without requiring a heavy runtime.</p>
+        <p>The name <em>Midori</em> — Japanese for "green" — reflects the project's green field design: a fresh take on a compiled language without legacy constraints.</p>
 
         <h2>Design Philosophy</h2>
-        <p>Every feature in Midori is guided by a few core principles:</p>
+        <p>Midori is guided by a few core principles:</p>
 
         <ul>
-            <li><strong>Beauty matters.</strong> Code is read far more often than it is written. Clean, consistent syntax reduces cognitive load and makes maintenance a joy.</li>
-            <li><strong>Safety without ceremony.</strong> Strong static types, immutability by default, and algebraic error handling eliminate entire categories of bugs without making you fight the type system.</li>
-            <li><strong>Zero-cost abstractions.</strong> High-level features like closures, traits, and pattern matching compile down to the same efficient machine code you would write by hand.</li>
-            <li><strong>Developer experience first.</strong> Clear error messages, fast compilation, and a batteries-included standard library keep you in flow state.</li>
+            <li><strong>Simplicity.</strong> No semicolons, no ceremony. Top-level code just runs.</li>
+            <li><strong>Approachable syntax.</strong> GDScript-inspired with braces. Functions use <code>func</code>, blocks use <code>{ }</code>.</li>
+            <li><strong>Strong types, inferred.</strong> Static typing with full type inference — write less, catch more.</li>
+            <li><strong>Built from scratch.</strong> Lexer, parser, type checker, codegen — all hand-written in Rust.</li>
         </ul>
 
-        <pre><code><span class="cm">// A glimpse of Midori — this compiles and runs</span>
-<span class="kw">fn</span> <span class="fn">greet</span>(name: <span class="tp">Str</span>) -> <span class="tp">Str</span> {
-    <span class="str">"Hello, {name}!"</span>
+        <h2>Hello, Midori</h2>
+        <p>A complete Midori program in one line:</p>
+
+        <pre><code><span class="cm">// hello.mi</span>
+print(<span class="str">"Hello, World!"</span>)</code></pre>
+
+        <p>Functions use the <code>func</code> keyword:</p>
+
+        <pre><code><span class="kw">func</span> <span class="fn">greet</span>(name) {
+    print(<span class="str">"Hello, {name}!"</span>)
 }
 
-<span class="kw">fn</span> <span class="fn">main</span>() {
-    <span class="fn">println</span>(<span class="fn">greet</span>(<span class="str">"Midori"</span>))
-}</code></pre>
+greet(<span class="str">"World"</span>)</code></pre>
 
         <h2>Who This Book Is For</h2>
-        <p>This book is for programmers of all experience levels who want to learn Midori. If you have experience with Rust, Swift, Kotlin, TypeScript, or Haskell, you will find many familiar concepts. But even if Midori is your first compiled language, the book starts from fundamentals and builds up gradually.</p>
-
-        <p>Each chapter includes runnable code examples. We recommend following along by installing the Midori compiler (covered in Chapter 2) and experimenting as you read.</p>
-
-        <pre><code><span class="cm">// Midori's type system catches errors at compile time</span>
-<span class="kw">fn</span> <span class="fn">divide</span>(a: <span class="tp">Int</span>, b: <span class="tp">Int</span>) -> <span class="tp">Result</span>&lt;<span class="tp">Int</span>, <span class="tp">Str</span>&gt; {
-    <span class="kw">if</span> b == <span class="num">0</span> {
-        <span class="tp">Err</span>(<span class="str">"division by zero"</span>)
-    } <span class="kw">else</span> {
-        <span class="tp">Ok</span>(a / b)
-    }
-}</code></pre>
-
-        <h2>What You Will Learn</h2>
-        <p>By the end of this book you will understand Midiro's entire type system, its pattern matching capabilities, its trait and generics system, and how to build real applications. You will also learn about the build system, testing, and the standard library so you can be productive from day one.</p>
-
-        <pre><code><span class="cm">// Pattern matching on enums — a common Midori pattern</span>
-<span class="kw">match</span> <span class="fn">divide</span>(<span class="num">10</span>, <span class="num">2</span>) {
-    <span class="tp">Ok</span>(val)  => <span class="fn">println</span>(<span class="str">"Result: {val}"</span>),
-    <span class="tp">Err</span>(msg) => <span class="fn">println</span>(<span class="str">"Error: {msg}"</span>),
-}</code></pre>
-
-        <div class="book-nav">
-            <span></span>
-            <a href="chapter-2.html" class="next">Next: Getting Started &rarr;</a>
-        </div>
+        <p>This book is for programmers curious about a new language designed for simplicity and developer joy. No prior knowledge of Midori is assumed.</p>
     </div>
 
     <footer>

@@ -1,44 +1,43 @@
+// midori
 // fileinfo.mi — a CLI file info utility
 // Usage: midori fileinfo.mi <filename>
 // Shows line/word/char counts and first line preview
 
-fn main() {
-    let args = os_args()
-    if len(args) < 2 {
-        println("Usage: fileinfo <filename>")
-        return
+let args = os_args()
+if len(args) < 2 {
+    println("Usage: fileinfo <filename>")
+    return
+}
+
+// Access filename from args
+// ponytail: args[1] returns mi_int (not mi_str) — filename hardcoded for now
+let filename = "test.txt"
+let content = read_file(filename)
+
+if content == "" {
+    if file_exists(filename) {
+        println("File '" + filename + "' is empty")
+    } else {
+        println("Error: file '" + filename + "' not found")
     }
+    return
+}
 
-    // Access filename from args
-    // ponytail: args[1] returns mi_int (not mi_str) — filename hardcoded for now
-    let filename = "test.txt"
-    let content = read_file(filename)
+let lines = count_lines(content)
+let words = count_words(content)
+let chars = len_str(content)
 
-    if content == "" {
-        if file_exists(filename) {
-            println("File '" + filename + "' is empty")
-        } else {
-            println("Error: file '" + filename + "' not found")
-        }
-        return
-    }
+println("=== " + filename + " ===")
+println("Lines: " + str(lines))
+println("Words: " + str(words))
+println("Chars: " + str(chars))
 
-    let lines = count_lines(content)
-    let words = count_words(content)
-    let chars = len_str(content)
-
-    println("=== " + filename + " ===")
-    println("Lines: " + str(lines))
-    println("Words: " + str(words))
-    println("Chars: " + str(chars))
-
-    if lines > 0 {
-        println("--- First line ---")
-        let first_newline = find_char(content, '\n')
-        if first_newline >= 0 {
-            let first_line = substring(content, 0, first_newline)
-            println(first_line)
-        }
+if lines > 0 {
+    println("--- First line ---")
+    let first_newline = find_char(content, '\n')
+    if first_newline >= 0 {
+        let first_line = substring(content, 0, first_newline)
+        println(first_line)
     }
 }
 

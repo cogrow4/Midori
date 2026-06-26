@@ -87,6 +87,40 @@ impl Parser {
             stmts.push(self.parse_stmt()?);
             self.skip_newlines();
         }
+        // If no explicit main() function, wrap top-level statements in one
+        let has_main = stmts.iter().any(|s| matches!(s, Stmt::Fn { name, .. } if name == "main"));
+        if !has_main {
+            // Separate declarations from body statements
+            let mut decls = Vec::new();
+            let mut body = Vec::new();
+            for stmt in stmts {
+                match &stmt {
+                    Stmt::Fn { .. } | Stmt::Type { .. } | Stmt::Trait { .. }
+                    | Stmt::Impl { .. } | Stmt::Extern { .. } => {
+                        decls.push(stmt);
+                    }
+                    _ => {
+                        body.push(stmt);
+                    }
+                }
+            }
+            let main_body = if body.len() == 1 {
+                match body.into_iter().next().unwrap() {
+                    Stmt::Expr(e) => e,
+                    other => Expr::Block(vec![other]),
+                }
+            } else {
+                Expr::Block(body)
+            };
+            stmts = decls;
+            stmts.push(Stmt::Fn {
+                name: "main".to_string(),
+                params: vec![],
+                return_type: None,
+                body: main_body,
+                pub_visible: false,
+            });
+        }
         Ok(Program { stmts })
     }
 
@@ -112,11 +146,11 @@ impl Parser {
             Token::Pub => {
                 self.advance(); // consume pub
                 match self.peek() {
-                    Token::Fn => self.parse_fn(true),
-                    _ => Err(self.err("expected fn after pub", self.tokens[self.pos].1, self.tokens[self.pos].2)),
+                    Token::Fn | Token::Func => self.parse_fn(true),
+                    _ => Err(self.err("expected fn/func after pub", self.tokens[self.pos].1, self.tokens[self.pos].2)),
                 }
             }
-            Token::Fn => self.parse_fn(false),
+            Token::Fn | Token::Func => self.parse_fn(false),
             Token::Let => self.parse_let(),
             Token::Var => {
                 self.advance(); // var
@@ -138,7 +172,9 @@ impl Parser {
             }
             Token::Extern => {
                 self.advance(); // extern
-                self.expect(Token::Fn)?;
+                if !self.eat(&Token::Fn) && !self.eat(&Token::Func) {
+                    return Err(self.err("expected fn/func after extern", self.tokens[self.pos].1, self.tokens[self.pos].2));
+                }
                 let name = match self.advance() {
                     Token::Ident(s) => s.clone(),
                     t => return Err(format!("expected function name, got {:?}", t)),
@@ -453,43 +489,33 @@ impl Parser {
             t => return Err(format!("expected type name in impl, got {:?}", t)),
         };
         self.skip_newlines();
-        // Check for "for" to implement a trait
-        if self.eat(&Token::For) {
+        let (trait_name, type_name) = if self.eat(&Token::For) {
             let trait_name = type_name;
             let type_name = match self.advance() {
                 Token::Ident(s) => s.clone(),
                 t => return Err(format!("expected type name after for, got {:?}", t)),
             };
-            self.expect(Token::LBrace)?;
-            self.skip_newlines();
-            let mut methods = Vec::new();
-            while !self.check(&Token::RBrace) && !self.check(&Token::Eof) {
-                if self.check(&Token::Fn) {
-                    methods.push(self.parse_fn(false)?);
-                } else {
-                    return Err(format!("expected fn in impl, got {:?}", self.peek()));
-                }
-                self.skip_newlines();
-            }
-            self.expect(Token::RBrace)?;
-            // Treat impl Trait for Type as statements
-            // For now, just store the methods under the type name
-            Ok(Stmt::Impl { type_name: format!("{} for {}", trait_name, type_name), methods })
+            (Some(trait_name), type_name)
         } else {
-            self.expect(Token::LBrace)?;
-            self.skip_newlines();
-            let mut methods = Vec::new();
-            while !self.check(&Token::RBrace) && !self.check(&Token::Eof) {
-                if self.check(&Token::Fn) {
-                    methods.push(self.parse_fn(false)?);
-                } else {
-                    return Err(format!("expected fn in impl, got {:?}", self.peek()));
-                }
-                self.skip_newlines();
+            (None, type_name)
+        };
+        self.expect(Token::LBrace)?;
+        self.skip_newlines();
+        let mut methods = Vec::new();
+        while !self.check(&Token::RBrace) && !self.check(&Token::Eof) {
+            if self.check(&Token::Fn) || self.check(&Token::Func) {
+                methods.push(self.parse_fn(false)?);
+            } else {
+                return Err(format!("expected fn/func in impl, got {:?}", self.peek()));
             }
-            self.expect(Token::RBrace)?;
-            Ok(Stmt::Impl { type_name, methods })
+            self.skip_newlines();
         }
+        self.expect(Token::RBrace)?;
+        let name = match trait_name {
+            Some(tn) => format!("{} for {}", tn, type_name),
+            None => type_name,
+        };
+        Ok(Stmt::Impl { type_name: name, methods })
     }
 
     fn parse_trait(&mut self) -> Result<Stmt, String> {
@@ -502,8 +528,8 @@ impl Parser {
         self.skip_newlines();
         let mut methods = Vec::new();
         while !self.check(&Token::RBrace) && !self.check(&Token::Eof) {
-            if self.check(&Token::Fn) {
-                self.advance(); // fn
+            if self.check(&Token::Fn) || self.check(&Token::Func) {
+                self.advance(); // fn/func
                 let mname = match self.advance() {
                     Token::Ident(s) => s.clone(),
                     t => return Err(format!("expected method name, got {:?}", t)),
@@ -519,7 +545,7 @@ impl Parser {
                 methods.push(TraitMethod { name: mname, params, return_type });
                 self.skip_newlines();
             } else {
-                return Err(format!("expected fn in trait, got {:?}", self.peek()));
+                return Err(format!("expected fn/func in trait, got {:?}", self.peek()));
             }
         }
         self.expect(Token::RBrace)?;
@@ -718,8 +744,8 @@ impl Parser {
                 Ok(Expr::Array(exprs))
             }
 
-            // Anonymous function: fn(x) { x * 2 }
-            Token::Fn => {
+            // Anonymous function: fn(x) { x * 2 } or func(x) { x * 2 }
+            Token::Fn | Token::Func => {
                 self.expect(Token::LParen)?;
                 let params = self.parse_fn_params()?;
                 self.expect(Token::RParen)?;
@@ -867,20 +893,9 @@ impl Parser {
     fn parse_match_arm(&mut self) -> Result<MatchArm, String> {
         let pattern = self.parse_pattern()?;
         if self.eat(&Token::If) {
-            // Guard clause - skip for now but consume
-            // For now just parse and discard the guard expression
-            // This is a simplification
             self.parse_expr()?;
         }
-        match self.peek() {
-            Token::FatArrow | Token::Arrow => {
-                self.advance();
-            }
-            _ => {
-                // Try => as arrow
-                self.expect(Token::FatArrow)?;
-            }
-        }
+        self.expect(Token::Colon)?;
         let body = self.parse_expr()?;
         Ok(MatchArm { pattern, body: Box::new(body) })
     }

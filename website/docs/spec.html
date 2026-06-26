@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Spec — Midori</title>
+    <link rel="stylesheet" href="../styles/midori.css">
+</head>
+<body>
+    <nav>
+        <a href="/" class="logo">
+            <svg class="logo-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="leaf" d="M16 4C12 4 6 8 6 16C6 24 10 28 16 28C18 28 20 27 22 25C20 24 18 22 17 19C16 16 17 12 20 9C22 7 24 5 26 4C24 3 20 2 16 4Z"/>
+                <path class="leaf-accent" d="M16 28C14 28 10 26 9 22C11 23 14 23 16 21C18 19 19 15 20 12C21 10 22 8 24 7C22 9 20 12 19 16C18 20 17 24 16 28Z"/>
+            </svg>
+            <span>midori</span>
+        </a>
+        <div class="nav-links">
+            <a href="../docs/">Docs</a>
+            <a href="../book/">Book</a>
+            <a href="https://github.com/cogrow4/Midori">GitHub</a>
+        </div>
+    </nav>
+
+    <div class="content">
+        <h1>Midori Language Specification</h1>
+        <p>Version: 0.1.0 (pre-release)</p>
+
+        <h2>1. Lexical Structure</h2>
+
+        <h3>1.1 Keywords</h3>
+        <pre><code>fn  func  let  var  mut  if  else  elif  match  for  while  loop
+break  continue  return  type  trait  impl  pub  import  as
+extern  true  false  nil  in  and  or  not  self  where</code></pre>
+
+        <h3>1.2 Literals</h3>
+        <ul>
+            <li><strong>Integer:</strong> <code>42</code> — 64-bit signed</li>
+            <li><strong>Float:</strong> <code>3.14</code> — 64-bit IEEE 754</li>
+            <li><strong>String:</strong> <code>"hello"</code> — with interpolation: <code>"Hello, {name}!"</code></li>
+            <li><strong>Char:</strong> <code>'A'</code> — ASCII</li>
+            <li><strong>Bool:</strong> <code>true</code> / <code>false</code></li>
+            <li><strong>Nil:</strong> <code>nil</code></li>
+        </ul>
+
+        <h2>2. Programs</h2>
+        <p>A Midori source file (.mi) consists of a sequence of declarations and statements. Top-level code that is not a declaration (<code>func</code>, <code>type</code>, <code>trait</code>, <code>impl</code>, <code>import</code>, <code>extern</code>) is implicitly wrapped in a <code>func main() { }</code> function.</p>
+
+        <pre><code><span class="cm">// This is a complete program — no main() needed</span>
+print(<span class="str">"Hello, World!"</span>)</code></pre>
+
+        <h2>3. Variables</h2>
+        <p><code>let</code> creates an immutable binding. <code>var</code> creates a mutable binding.</p>
+
+        <pre><code><span class="kw">let</span> x = <span class="num">42</span>          <span class="cm">// immutable</span>
+<span class="kw">var</span> y = <span class="num">99</span>          <span class="cm">// mutable</span>
+y = y + <span class="num">1</span>
+
+<span class="cm">// Explicit type annotation</span>
+<span class="kw">let</span> name: <span class="tp">Str</span> = <span class="str">"Midori"</span></code></pre>
+
+        <h2>4. Functions</h2>
+        <p>Functions are defined with <code>func</code> (or <code>fn</code> for backwards compatibility):</p>
+
+        <pre><code><span class="kw">func</span> greet(name: <span class="tp">Str</span>) {
+    println(<span class="str">"Hello, {name}!"</span>)
+}
+
+<span class="kw">func</span> add(x: <span class="tp">Int</span>, y: <span class="tp">Int</span>) -> <span class="tp">Int</span> {
+    x + y  <span class="cm">// implicit return</span>
+}</code></pre>
+
+        <p>Parameters can have type annotations. Return type is specified with <code>-&gt;</code> if not inferred.</p>
+
+        <h2>5. Control Flow</h2>
+
+        <h3>5.1 If / Elif / Else</h3>
+        <pre><code><span class="kw">if</span> x &gt; <span class="num">0</span> {
+    println(<span class="str">"positive"</span>)
+} <span class="kw">elif</span> x &lt; <span class="num">0</span> {
+    println(<span class="str">"negative"</span>)
+} <span class="kw">else</span> {
+    println(<span class="str">"zero"</span>)
+}</code></pre>
+
+        <h3>5.2 Match</h3>
+        <p>Pattern matching uses <code>:</code> between the pattern and its body:</p>
+        <pre><code><span class="kw">match</span> x {
+    <span class="num">1</span>: println(<span class="str">"one"</span>)
+    <span class="num">2</span>: println(<span class="str">"two"</span>)
+    <span class="kw">_</span>: println(<span class="str">"other"</span>)
+}</code></pre>
+
+        <h3>5.3 For</h3>
+        <pre><code><span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">5</span>) {
+    println(str(i))
+}
+
+<span class="kw">for</span> name <span class="kw">in</span> [<span class="str">"A"</span>, <span class="str">"B"</span>] {
+    println(name)
+}</code></pre>
+
+        <h3>5.4 While</h3>
+        <pre><code><span class="kw">var</span> i = <span class="num">0</span>
+<span class="kw">while</span> i &lt; <span class="num">5</span> {
+    i = i + <span class="num">1</span>
+}</code></pre>
+
+        <h3>5.5 Loop</h3>
+        <pre><code><span class="kw">loop</span> {
+    <span class="kw">if</span> done { <span class="kw">break</span> }
+    <span class="kw">continue</span>
+}</code></pre>
+
+        <h2>6. Types</h2>
+
+        <h3>6.1 Primitive Types</h3>
+        <ul>
+            <li><code>Int</code> — 64-bit signed integer</li>
+            <li><code>Float</code> — 64-bit floating point</li>
+            <li><code>Bool</code> — boolean (true/false)</li>
+            <li><code>Str</code> — string with length prefix</li>
+            <li><code>Char</code> — ASCII character</li>
+            <li><code>Nil</code> — unit type (void)</li>
+        </ul>
+
+        <h3>6.2 Custom Types</h3>
+        <pre><code><span class="kw">type</span> Point {
+    x: <span class="tp">Float</span>
+    y: <span class="tp">Float</span>
+}
+
+<span class="kw">type</span> Color {
+    Red
+    Green
+    Blue
+}</code></pre>
+
+        <h2>7. Methods</h2>
+        <pre><code><span class="kw">type</span> Vec2 {
+    x: <span class="tp">Float</span>
+    y: <span class="tp">Float</span>
+}
+
+<span class="kw">impl</span> Vec2 {
+    <span class="kw">func</span> len(this) -> <span class="tp">Float</span> {
+        sqrt(this.x * this.x + this.y * this.y)
+    }
+}
+
+<span class="kw">let</span> v = Vec2 { x: <span class="num">3.0</span>, y: <span class="num">4.0</span> }
+println(str_float(v.len()))</code></pre>
+
+        <h2>8. Built-in Functions</h2>
+        <p>See the <a href="api-reference.html">API Reference</a> for a complete list.</p>
+
+        <h2>9. Grammar</h2>
+        <p>A formal grammar is available in the <a href="grammar.md">grammar.md</a> file.</p>
+    </div>
+
+    <footer>
+        <p>Midori is free and open source. <a href="https://github.com/cogrow4/Midori">Contributions welcome</a>.</p>
+        <p style="margin-top:0.5rem; font-size:0.8rem;">&copy; 2026 The Midori Contributors</p>
+    </footer>
+</body>
+</html>

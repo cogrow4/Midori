@@ -1,3 +1,4 @@
+// midori
 fn factorial(n: Int) -> Int {
     if n <= 1 {
         1
@@ -6,7 +7,5 @@ fn factorial(n: Int) -> Int {
     }
 }
 
-fn main() {
-    let result: Int = factorial(10)
-    println(str(result))
-}
+let result: Int = factorial(10)
+println(str(result))

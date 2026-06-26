@@ -1,3 +1,2 @@
-fn main() {
-    println("Hello, Midori!")
-}
+// midori
+println("Hello, Midori!")
