@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Midori — A Beautiful Compiled Language</title>
+    <title>Midori — A Compiled Language with Pythonic Syntax</title>
     <link rel="stylesheet" href="styles/midori.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
     <nav>
@@ -19,104 +18,142 @@
         <div class="nav-links">
             <a href="docs/">Docs</a>
             <a href="book/">Book</a>
-            <a href="https://github.com/midori-lang/midori">GitHub</a>
+            <a href="https://github.com/cogrow4/Midori">GitHub</a>
         </div>
     </nav>
 
     <section class="hero">
         <div class="version-badge">
             <span class="dot"></span>
-            v0.1.0 — Pre-release
+            Pre-release
         </div>
 
-        <h1>A language as <span class="highlight">fresh</span> as it sounds</h1>
-        <p class="subtitle">Midori is a compiled programming language designed for developer joy. Clean syntax, strong types, zero-cost abstractions — all wrapped in an aesthetic that makes code beautiful again.</p>
+        <h1>Compiled, <span class="highlight">Pythonic</span>, from scratch</h1>
+        <p class="subtitle">
+            Midori is a compiled programming language with Python-inspired syntax and C-style braces.
+            Type inference, string interpolation, match expressions, method dispatch — built from
+            the ground up in Rust. Compiles through C to native code.
+        </p>
 
         <div class="code-sample">
-            <span class="comment">// hello.mi</span><br>
-            <span class="fn">fn</span> greet(name: <span class="keyword">Str</span>) -> <span class="keyword">Str</span> {<br>
-            &nbsp;&nbsp;<span class="string">"Hello, {name}!"</span><br>
+            <span class="cm">// hello.mi</span><br>
+            <span class="kw">fn</span> <span class="fn">greet</span>(name: <span class="tp">Str</span>) -> <span class="tp">Str</span> {<br>
+            &nbsp;&nbsp;<span class="str">"Hello, {name}!"</span><br>
             }<br><br>
-            <span class="fn">fn</span> <span class="fn">main</span>() {<br>
-            &nbsp;&nbsp;<span class="fn">println</span>(greet(<span class="string">"Midori"</span>))<br>
+            <span class="kw">fn</span> <span class="fn">main</span>() {<br>
+            &nbsp;&nbsp;<span class="fn">println</span>(<span class="fn">greet</span>(<span class="str">"Midori"</span>))<br>
             }
         </div>
 
         <div class="buttons">
-            <a href="book/" class="btn btn-primary">Read the Book</a>
-            <a href="docs/" class="btn btn-secondary">Documentation</a>
+            <a href="#features" class="btn btn-primary">Features</a>
+            <a href="#quickstart" class="btn btn-secondary">Get Started</a>
+            <a href="docs/" class="btn btn-secondary">Docs</a>
         </div>
     </section>
 
-    <div class="stats">
-        <div class="stat-item">
-            <div class="stat-number">2K+</div>
-            <div class="stat-label">Lines of Code</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-number">15</div>
-            <div class="stat-label">Language Features</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-number">100%</div>
-            <div class="stat-label">Hand-rolled</div>
-        </div>
-    </div>
-
-    <div class="features">
-        <div class="section-label">Why Midori?</div>
-
-        <div class="feature-card">
-            <span class="feature-icon">🌿</span>
-            <h3>Beautiful Syntax</h3>
-            <p>Clean, expressive syntax that feels natural. Type inference, pattern matching, and string interpolation make code a pleasure to write. Familiar C-style braces with Pythonic sensibilities.</p>
-        </div>
-        <div class="feature-card">
-            <span class="feature-icon">⚡</span>
-            <h3>Compiled &amp; Fast</h3>
-            <p>Compiles through C to native machine code via Clang/GCC. Zero-cost abstractions mean you never pay for what you don't use. No runtime overhead, no garbage collector pauses.</p>
-        </div>
-        <div class="feature-card">
-            <span class="feature-icon">🔒</span>
-            <h3>Type Safe</h3>
-            <p>Strong static typing with full type inference. No null pointer exceptions. Option and Result types make error handling explicit and compiler-enforced.</p>
-        </div>
-        <div class="feature-card">
-            <span class="feature-icon">🔄</span>
-            <h3>Immutable by Default</h3>
-            <p>Variables are immutable by default. The <code>var</code> keyword makes mutability explicit, and the type system tracks it. Makes code easier to reason about and parallelize.</p>
-        </div>
-        <div class="feature-card">
-            <span class="feature-icon">🎯</span>
-            <h3>Developer UX First</h3>
-            <p>From the error messages to the CLI toolchain, every surface is designed to keep you in flow state. One binary, zero dependencies, instant startup.</p>
-        </div>
-        <div class="feature-card">
-            <span class="feature-icon">🔄</span>
-            <h3>Self-Hosting Path</h3>
-            <p>The Midori compiler is bootstrapping-ready. Written in Rust first, the plan is to rewrite the compiler in Midori itself — proving the language is production-ready.</p>
+    <!-- Live terminal demo -->
+    <div class="terminal-demo">
+        <div class="terminal">
+            <div class="terminal-header">
+                <span class="terminal-dot"></span>
+                <span class="terminal-dot"></span>
+                <span class="terminal-dot"></span>
+                <span class="terminal-title">bash — midori</span>
+            </div>
+            <div class="terminal-body">
+                <span class="prompt">$ </span><span class="cmd">cat hello.mi</span><br>
+                <span class="output">fn main() {</span><br>
+                <span class="output">    println("Hello, Midori!")</span><br>
+                <span class="output">}</span><br>
+                <span class="prompt">$ </span><span class="cmd">midori hello.mi</span><br>
+                <span class="output">Hello, Midori!</span><br>
+                <span class="prompt">$ </span><span class="cmd">midori build hello.mi && ./hello</span><br>
+                <span class="output">Hello, Midori!</span><br>
+                <span class="prompt">$ </span><span class="cursor">&nbsp;</span>
+            </div>
         </div>
     </div>
 
-    <div class="features" style="padding-top: 0;">
-        <div class="section-label">Quick Start</div>
-        <div class="feature-card" style="grid-column: 1 / -1;">
-            <pre style="background: none; border: none; padding: 0; margin: 0; font-size: 0.85rem;"><code><span class="cm"># Install</span>
-curl -fsSL https://midori-lang.dev/install.sh | sh
+    <!-- Features -->
+    <div class="features" id="features">
+        <div class="section-label">Status</div>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <span class="status status-done">Done</span>
+                <h3>Functions &amp; Variables</h3>
+                <p>Functions with type annotations, type inference via <code>let</code>&sol;<code>var</code>, mutability tracking. Block expressions as implicit returns.</p>
+            </div>
+            <div class="feature-card">
+                <span class="status status-done">Done</span>
+                <h3>Control Flow</h3>
+                <p><code>if/elif/else</code>, <code>while</code>, <code>for</code> (range and iter), <code>loop/break/continue</code>. Pattern matching with <code>match</code>.</p>
+            </div>
+            <div class="feature-card">
+                <span class="status status-done">Done</span>
+                <h3>String Interpolation</h3>
+                <p><code>"Hello, {name}!"</code> — inline expressions in strings, compiled to concatenation chains.</p>
+            </div>
+            <div class="feature-card">
+                <span class="status status-done">Done</span>
+                <h3>Structs &amp; Enums</h3>
+                <p>Custom data types with named fields. Enums with variants. <code>impl</code> blocks for methods. Method dispatch with <code>obj.method()</code> syntax.</p>
+            </div>
+            <div class="feature-card">
+                <span class="status status-done">Done</span>
+                <h3>CLI Toolchain</h3>
+                <p>Single binary. <code>midori file.mi</code> to run, <code>midori build</code> to compile, <code>midori dev</code> for watch mode, <code>midori new</code> for project scaffold.</p>
+            </div>
+            <div class="feature-card">
+                <span class="status status-done">Done</span>
+                <h3>File I/O &amp; Builtins</h3>
+                <p><code>read_file</code>, <code>write_file</code>, <code>file_exists</code>, <code>os_args</code>, math functions, string builder, string/array utilities.</p>
+            </div>
+            <div class="feature-card">
+                <span class="status status-wip">In Progress</span>
+                <h3>Error Handling</h3>
+                <p>Source-aware error messages with caret highlighting in parser and type checker. Runtime error handling still evolving.</p>
+            </div>
+            <div class="feature-card">
+                <span class="status status-wip">In Progress</span>
+                <h3>Standard Library</h3>
+                <p>Growing collection of built-in functions and utilities. Core types (String, Array, Int, Float, Bool, Char). More coming.</p>
+            </div>
+            <div class="feature-card">
+                <span class="status status-wip">Planned</span>
+                <h3>Generics &amp; Closures</h3>
+                <p>Polymorphic functions, type parameters, first-class closures. On the roadmap.</p>
+            </div>
+        </div>
+    </div>
 
-<span class="cm"># Create and run</span>
-midori new my-project
-cd my-project
-midori run main.mi
-
-<span class="cm"># Or just run a single file</span>
-midori hello.mi <span class="cm"># Hello, Midori!</span></code></pre>
+    <!-- Quick Start -->
+    <div class="quickstart" id="quickstart">
+        <div class="section-label">Get Started</div>
+        <div class="terminal">
+            <div class="terminal-header">
+                <span class="terminal-dot"></span>
+                <span class="terminal-dot"></span>
+                <span class="terminal-dot"></span>
+                <span class="terminal-title">bash — install</span>
+            </div>
+            <div class="terminal-body">
+                <span class="prompt">$ </span><span class="cmd">git clone https://github.com/cogrow4/Midori.git</span><br>
+                <span class="prompt">$ </span><span class="cmd">cd Midori</span><br>
+                <span class="prompt">$ </span><span class="cmd">./install.sh</span><br>
+                <span class="output">Building Midori compiler...</span><br>
+                <span class="output">Installed to ~/.local/bin/midori</span><br>
+                <span class="prompt">$ </span><span class="cmd">echo 'fn main() { println("hello!") }' &gt; test.mi</span><br>
+                <span class="prompt">$ </span><span class="cmd">midori test.mi</span><br>
+                <span class="output">hello!</span><br>
+                <span class="prompt">$ </span><span class="cursor">&nbsp;</span>
+            </div>
         </div>
     </div>
 
     <footer>
-        <p>Midori is free and open source. <a href="https://github.com/midori-lang/midori">Contributions welcome</a>.</p>
-        <p style="margin-top:0.5rem; font-size:0.8rem;">&copy; 2026 The Midori Contributors</p>
+        <p>Midori is free and open source. <a href="https://github.com/cogrow4/Midori">Contributions welcome</a>.</p>
+        <p style="margin-top:0.5rem; font-size:0.8rem; color: var(--text-muted);">&copy; 2026 The Midori Contributors</p>
     </footer>
 </body>
 </html>

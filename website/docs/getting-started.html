@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Getting Started — Midori</title>
     <link rel="stylesheet" href="../styles/midori.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
     <nav>
@@ -19,7 +18,7 @@
         <div class="nav-links">
             <a href="../docs/">Docs</a>
             <a href="../book/">Book</a>
-            <a href="https://github.com/midori-lang/midori">GitHub</a>
+            <a href="https://github.com/cogrow4/Midori">GitHub</a>
         </div>
     </nav>
 
@@ -27,11 +26,15 @@
         <h1>Getting Started</h1>
 
         <h2>Installation</h2>
-        <p>Download the latest Midori compiler from <a href="https://github.com/midori-lang/midori">GitHub</a>. Pre-built binaries are available for macOS, Linux, and Windows.</p>
-        <p>Once downloaded, add the <code>midori</code> binary to your <code>$PATH</code> and verify the installation:</p>
+        <p>Clone and build Midori from source. You need <strong>Rust</strong> and a <strong>C compiler</strong> (Clang or GCC).</p>
 
-        <pre><code><span class="op">$</span> midori --version
-midori <span class="num">0.1</span>.<span class="num">0</span></code></pre>
+        <pre><code>git clone https://github.com/cogrow4/Midori.git
+cd Midori
+./install.sh</code></pre>
+
+        <p>The <code>install.sh</code> script builds the compiler with <code>cargo build --release</code> and copies the binary to <code>~/.local/bin/midori</code>. Verify the installation:</p>
+
+        <pre><code><span class="op">$</span> midori --version</code></pre>
 
         <h2>Your First Program</h2>
         <p>Create a file called <code>hello.mi</code>:</p>
@@ -42,25 +45,25 @@ midori <span class="num">0.1</span>.<span class="num">0</span></code></pre>
 }</code></pre>
 
         <h3>Running the Program</h3>
-        <p>Use the <code>midori run</code> command to execute it directly:</p>
+        <p>Use the <code>midori</code> command to compile and run it directly:</p>
 
-        <pre><code><span class="op">$</span> midori run hello.mi
+        <pre><code><span class="op">$</span> midori hello.mi
 Hello, world!</code></pre>
 
-        <p>Or use <code>midori build</code> to compile an executable:</p>
+        <p>Or use <code>midori build</code> to compile a standalone executable:</p>
 
         <pre><code><span class="op">$</span> midori build hello.mi
 <span class="op">$</span> ./hello
 Hello, world!</code></pre>
 
         <h2>Variables and Basic Types</h2>
-        <p>Midori is immutable by default. Use <code>let</code> to bind a value, and <code>mut</code> to make it mutable:</p>
+        <p>Midori is immutable by default. Use <code>let</code> to bind a value, and <code>var</code> to make it mutable:</p>
 
         <pre><code><span class="kw">let</span> greeting = <span class="str">"Hello"</span>          <span class="cm">// immutable</span>
-<span class="kw">let</span> <span class="kw">mut</span> count = <span class="num">0</span>            <span class="cm">// mutable</span>
+<span class="kw">var</span> count = <span class="num">0</span>                   <span class="cm">// mutable</span>
 count = count + <span class="num">1</span>
 
-<span class="cm">// Type annotation (optional — Midori infers types)</span>
+<span class="cm">// Explicit type annotation</span>
 <span class="kw">let</span> name: <span class="tp">Str</span> = <span class="str">"Midori"</span>
 <span class="kw">let</span> age: <span class="tp">Int</span> = <span class="num">1</span></code></pre>
 
@@ -91,7 +94,7 @@ count = count + <span class="num">1</span>
     </div>
 
     <footer>
-        <p>Midori is free and open source. <a href="https://github.com/midori-lang/midori">Contributions welcome</a>.</p>
+        <p>Midori is free and open source. <a href="https://github.com/cogrow4/Midori">Contributions welcome</a>.</p>
         <p style="margin-top:0.5rem; font-size:0.8rem;">&copy; 2026 The Midori Contributors</p>
     </footer>
 </body>

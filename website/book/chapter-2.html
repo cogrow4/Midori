@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 2 — Getting Started | The Midori Programming Language</title>
+    <title>Getting Started — Midori Book</title>
     <link rel="stylesheet" href="../styles/midori.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
     <nav>
@@ -17,9 +16,9 @@
             <span>midori</span>
         </a>
         <div class="nav-links">
-            <a href="../docs/">Docs</a>
             <a href="../book/">Book</a>
-            <a href="https://github.com/midori-lang/midori">GitHub</a>
+            <a href="../docs/">Docs</a>
+            <a href="https://github.com/cogrow4/Midori">GitHub</a>
         </div>
     </nav>
 
@@ -27,12 +26,19 @@
         <h1>Chapter 2: Getting Started</h1>
 
         <h2>Installation</h2>
-        <p>The Midori compiler is distributed as a single binary. You can download the latest release from the <a href="https://github.com/midori-lang/midori">GitHub releases page</a>, or build from source if you prefer. On macOS you can install via Homebrew:</p>
+        <p>Midori is built from source. You need Rust and a C compiler (Clang or GCC) installed on your system.</p>
 
-        <pre><code><span class="cm"># Install Midori on macOS</span>
-brew install midori-lang/midori</code></pre>
+        <pre><code><span class="cm"># Clone the repository</span>
+git clone https://github.com/cogrow4/Midori.git
+cd Midori
 
-        <p>On Linux, download the tarball and add the <code>midori</code> binary to your PATH. Windows users can use the installer from the releases page. After installation, verify everything works:</p>
+<span class="cm"># Build and install</span>
+./install.sh
+<span class="cm"># Installs to ~/.local/bin/midori</span></code></pre>
+
+        <p>The <code>install.sh</code> script builds the compiler and copies it to your PATH. You can also use <code>cargo build --release</code> in the <code>compiler/</code> directory if you prefer to manage the binary yourself.</p>
+
+        <p>After installation, verify everything works:</p>
 
         <pre><code><span class="cm"># Check the compiler version</span>
 midori --version</code></pre>
@@ -44,58 +50,36 @@ midori --version</code></pre>
     <span class="fn">println</span>(<span class="str">"Hello, World!"</span>)
 }</code></pre>
 
-        <p>Every Midori program starts with a <code>main</code> function. The <code>println</code> function writes text to standard output. Notice there are no semicolons &mdash; Midori uses newlines for statement separation, keeping the code clean and minimal.</p>
+        <p>Now run it with the Midori compiler:</p>
 
-        <p>To compile and run your program, use the <code>run</code> subcommand:</p>
+        <pre><code><span class="op">$</span> midori hello.mi
+Hello, World!</code></pre>
 
-        <pre><code>midori run hello.mi</code></pre>
+        <p>The <code>midori</code> command compiles the source file to C, links it with the runtime library, and executes the resulting binary. You can also build a standalone binary:</p>
 
-        <p>You should see <code>Hello, World!</code> printed to your terminal. Congratulations &mdash; you have written your first Midori program!</p>
+        <pre><code><span class="op">$</span> midori build hello.mi
+<span class="op">$</span> ./hello
+Hello, World!</code></pre>
 
-        <h2>The Compiler Toolchain</h2>
-        <p>The <code>midori</code> command provides several subcommands:</p>
+        <h2>Creating a Project</h2>
+        <p>For larger programs, you can create a project scaffold:</p>
 
-        <ul>
-            <li><code>midori build</code> &mdash; Compile the project to a binary.</li>
-            <li><code>midori run</code> &mdash; Compile and run in one step.</li>
-            <li><code>midori test</code> &mdash; Run tests for the current project.</li>
-            <li><code>midori fmt</code> &mdash; Format source code according to standard style.</li>
-            <li><code>midori new</code> &mdash; Scaffold a new project with the standard directory layout.</li>
-        </ul>
+        <pre><code><span class="op">$</span> midori new my-project
+<span class="op">$</span> cd my-project
+<span class="op">$</span> midori run main.mi</code></pre>
 
-        <p>Let's create a proper project using <code>midori new</code>:</p>
+        <p>The <code>midori new</code> command creates a directory with a <code>main.mi</code> file and a placeholder <code>README.md</code>.</p>
 
-        <pre><code><span class="cm"># Create a new project called "my-project"</span>
-midori new my-project
-cd my-project</code></pre>
+        <h2>Watch Mode</h2>
+        <p>While developing, use <code>midori dev</code> to automatically recompile and re-run whenever you save changes:</p>
 
-        <p>This creates the following structure:</p>
-
-        <pre><code>my-project/
-  src/
-    main.mi
-  midori.toml</code></pre>
-
-        <p>The <code>midori.toml</code> file is the project manifest, similar to <code>Cargo.toml</code> in Rust or <code>package.json</code> in Node.js. It contains the project name, version, dependencies, and compiler settings.</p>
-
-        <pre><code><span class="cm"># my-project/src/main.mi</span>
-<span class="kw">fn</span> <span class="fn">main</span>() {
-    <span class="kw">let</span> name = <span class="str">"Midori"</span>
-    <span class="fn">println</span>(<span class="str">"Welcome to {name}!"</span> <span class="op">+</span> <span class="str">" 🍃"</span>)
-}</code></pre>
-
-        <p>Build and run the project with:</p>
-
-        <pre><code>midori run</code></pre>
-
-        <div class="book-nav">
-            <a href="chapter-1.html">&larr; Previous: Introduction</a>
-            <a href="chapter-3.html" class="next">Next: Basic Syntax &rarr;</a>
-        </div>
+        <pre><code><span class="op">$</span> midori dev hello.mi
+<span class="cm"># File watcher polls every 500ms</span>
+<span class="cm"># Re-runs on change</span></code></pre>
     </div>
 
     <footer>
-        <p>Midori is free and open source. <a href="https://github.com/midori-lang/midori">Contributions welcome</a>.</p>
+        <p>Midori is free and open source. <a href="https://github.com/cogrow4/Midori">Contributions welcome</a>.</p>
         <p style="margin-top:0.5rem; font-size:0.8rem;">&copy; 2026 The Midori Contributors</p>
     </footer>
 </body>
