@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom Types — Midori</title>
+    <title>Structs &amp; Enums — Midori</title>
     <link rel="stylesheet" href="../styles/midori.css">
 </head>
 <body>
@@ -23,158 +23,79 @@
     </nav>
 
     <div class="content">
-        <h1>Custom Types</h1>
-        <p>Midori uses the <code>type</code> keyword to define both structs (product types) and enums (sum types). This gives you a unified way to model your data.</p>
+        <h1>Structs &amp; Enums</h1>
 
-        <h2>Structs with <code>type</code></h2>
-        <p>Define a struct with named fields:</p>
+        <h2>Structs</h2>
+        <p>Define a struct with the <code>type</code> keyword — a single variant with the same name as the type creates a struct:</p>
 
-        <pre><code><span class="kw">type</span> <span class="tp">User</span> {
-    name: <span class="tp">Str</span>,
-    email: <span class="tp">Str</span>,
-    age: <span class="tp">Int</span>,
+        <pre><code><span class="kw">type</span> Point {
+    x: <span class="tp">Float</span>
+    y: <span class="tp">Float</span>
 }
 
-<span class="cm">// Creating an instance</span>
-<span class="kw">let</span> user = <span class="tp">User</span> {
-    name: <span class="str">"Alice"</span>,
-    email: <span class="str">"alice@example.com"</span>,
-    age: <span class="num">30</span>,
+<span class="kw">let</span> p = Point { x: <span class="num">1.0</span>, y: <span class="num">2.0</span> }
+println(p.x)  <span class="cm">// field access: 1.0</span></code></pre>
+
+        <h2>Enums</h2>
+        <p>Multiple variants create an enum. Variants can hold data:</p>
+
+        <pre><code><span class="kw">type</span> Status {
+    Active
+    Inactive
+    Banned { reason: <span class="tp">Str</span> }
 }
 
-<span class="cm">// Accessing fields</span>
-println(user.name)   <span class="cm">// "Alice"</span>
-println(user.age)    <span class="num">30</span></code></pre>
-
-        <h2>Enums with <code>type</code></h2>
-        <p>Define an enum with variants that can carry data:</p>
-
-        <pre><code><span class="kw">type</span> <span class="tp">Status</span> {
-    <span class="tp">Active</span>,
-    <span class="tp">Inactive</span>,
-    <span class="tp">Banned</span>(reason: <span class="tp">Str</span>),
-}
-
-<span class="kw">let</span> status = <span class="tp">Active</span>
-<span class="kw">let</span> banned = <span class="tp">Status</span>.<span class="tp">Banned</span>(<span class="str">"spam"</span>)</code></pre>
+<span class="cm">// Enum field access via match</span>
+<span class="kw">match</span> status {
+    Status::Active => println(<span class="str">"active"</span>),
+    Status::Inactive => println(<span class="str">"inactive"</span>),
+    Status::Banned { reason } => println(<span class="str">"banned: {reason}"</span>),
+}</code></pre>
 
         <h2>Methods with <code>impl</code></h2>
-        <p>Add methods to any type using an <code>impl</code> block. The first parameter is always <code>self</code>:</p>
+        <p>Add methods to a type using <code>impl</code>. The first parameter is the receiver (conventionally named <code>this</code>):</p>
 
-        <pre><code><span class="kw">type</span> <span class="tp">Vec2</span> {
-    x: <span class="tp">Float</span>,
-    y: <span class="tp">Float</span>,
+        <pre><code><span class="kw">type</span> Vec2 {
+    x: <span class="tp">Float</span>
+    y: <span class="tp">Float</span>
 }
 
-<span class="kw">impl</span> <span class="tp">Vec2</span> {
-    <span class="cm">// Constructor</span>
-    <span class="kw">fn</span> new(x: <span class="tp">Float</span>, y: <span class="tp">Float</span>) -> <span class="tp">Vec2</span> {
-        <span class="tp">Vec2</span> { x, y }  <span class="cm">// shorthand field init</span>
-    }
-
-    <span class="cm">// Method taking &self (immutable)</span>
-    <span class="kw">fn</span> magnitude(<span class="kw">self</span>) -> <span class="tp">Float</span> {
-        (self.x <span class="op">*</span> self.x <span class="op">+</span> self.y <span class="op">*</span> self.y).sqrt()
-    }
-
-    <span class="cm">// Method taking &mut self</span>
-    <span class="kw">fn</span> normalize(<span class="kw">mut</span> <span class="kw">self</span>) {
-        <span class="kw">let</span> mag = self.magnitude()
-        self.x = self.x <span class="op">/</span> mag
-        self.y = self.y <span class="op">/</span> mag
+<span class="kw">impl</span> Vec2 {
+    <span class="kw">fn</span> len(this) -> <span class="tp">Float</span> {
+        sqrt(this.x <span class="op">*</span> this.x <span class="op">+</span> this.y <span class="op">*</span> this.y)
     }
 }
 
-<span class="kw">let</span> v = <span class="tp">Vec2</span>.new(<span class="num">3.0</span>, <span class="num">4.0</span>)
-println(v.magnitude())  <span class="cm">// 5.0</span></code></pre>
+<span class="kw">let</span> v = Vec2 { x: <span class="num">3.0</span>, y: <span class="num">4.0</span> }
+println(str_float(v.len()))  <span class="cm">// 5.0</span></code></pre>
 
         <h2>Traits</h2>
-        <p>Traits define shared behavior across types. Implement a trait for any type with <code>impl</code>:</p>
+        <p>Traits define shared behavior across types:</p>
 
-        <pre><code><span class="cm">// Define a trait</span>
-<span class="kw">trait</span> <span class="tp">Describable</span> {
-    <span class="kw">fn</span> describe(<span class="kw">self</span>) -> <span class="tp">Str</span>
+        <pre><code><span class="kw">trait</span> Shape {
+    <span class="kw">fn</span> area(this) -> <span class="tp">Float</span>
 }
 
-<span class="cm">// Implement the trait for a type</span>
-<span class="kw">impl</span> <span class="tp">Describable</span> <span class="kw">for</span> <span class="tp">User</span> {
-    <span class="kw">fn</span> describe(<span class="kw">self</span>) -> <span class="tp">Str</span> {
-        <span class="str">"User {self.name}, age {self.age}"</span>
-    }
+<span class="kw">type</span> Circle {
+    radius: <span class="tp">Float</span>
 }
 
-<span class="kw">impl</span> <span class="tp">Describable</span> <span class="kw">for</span> <span class="tp">Vec2</span> {
-    <span class="kw">fn</span> describe(<span class="kw">self</span>) -> <span class="tp">Str</span> {
-        <span class="str">"Vec2({self.x}, {self.y})"</span>
-    }
-}
-
-<span class="cm">// Use the trait</span>
-<span class="kw">fn</span> print_description(item: <span class="kw">impl</span> <span class="tp">Describable</span>) {
-    println(item.describe())
-}
-
-print_description(user)  <span class="cm">// "User Alice, age 30"</span>
-print_description(v)     <span class="cm">// "Vec2(3.0, 4.0)"</span></code></pre>
-
-        <h2>Pattern Matching on Enums</h2>
-        <p>Enums shine with pattern matching. The compiler ensures all variants are handled exhaustively:</p>
-
-        <pre><code><span class="kw">type</span> <span class="tp">Tree</span>[T] {
-    <span class="tp">Leaf</span>(value: <span class="tp">T</span>),
-    <span class="tp">Node</span>(left: <span class="tp">Box</span>[<span class="tp">Tree</span>[T]], right: <span class="tp">Box</span>[<span class="tp">Tree</span>[T]]),
-}
-
-<span class="kw">fn</span> depth[T](tree: <span class="tp">Tree</span>[T]) -> <span class="tp">Int</span> {
-    <span class="kw">match</span> tree {
-        <span class="tp">Leaf</span>(<span class="kw">_</span>) => <span class="num">1</span>,
-        <span class="tp">Node</span>(left, right) => {
-            <span class="num">1</span> <span class="op">+</span> max(depth(left), depth(right))
-        },
-    }
-}
-
-<span class="cm">// Enum with destructuring</span>
-<span class="kw">type</span> <span class="tp">Message</span> {
-    <span class="tp">Quit</span>,
-    <span class="tp">Move</span>(x: <span class="tp">Int</span>, y: <span class="tp">Int</span>),
-    <span class="tp">Write</span>(text: <span class="tp">Str</span>),
-    <span class="tp">ChangeColor</span>(r: <span class="tp">Int</span>, g: <span class="tp">Int</span>, b: <span class="tp">Int</span>),
-}
-
-<span class="kw">fn</span> handle(msg: <span class="tp">Message</span>) {
-    <span class="kw">match</span> msg {
-        <span class="tp">Quit</span> => println(<span class="str">"goodbye"</span>),
-        <span class="tp">Move</span>(x, y) => println(<span class="str">"move to ({x}, {y})"</span>),
-        <span class="tp">Write</span>(text) => println(<span class="str">"write: {text}"</span>),
-        <span class="tp">ChangeColor</span>(r, g, b) => {
-            println(<span class="str">"color: rgb({r}, {g}, {b})"</span>)
-        },
+<span class="kw">impl</span> Shape <span class="kw">for</span> Circle {
+    <span class="kw">fn</span> area(this) -> <span class="tp">Float</span> {
+        pi() <span class="op">*</span> this.radius <span class="op">*</span> this.radius
     }
 }</code></pre>
 
-        <h2>Generic Types</h2>
-        <p>Types can be parameterized with generics:</p>
+        <h2>Struct Field Access</h2>
+        <p>Use dot notation to access fields, and methods via method dispatch:</p>
 
-        <pre><code><span class="kw">type</span> <span class="tp">Pair</span>[A, B] {
-    first: <span class="tp">A</span>,
-    second: <span class="tp">B</span>,
-}
-
-<span class="kw">impl</span>[A, B] <span class="tp">Pair</span>[A, B] {
-    <span class="kw">fn</span> swap(<span class="kw">self</span>) -> <span class="tp">Pair</span>[B, A] {
-        <span class="tp">Pair</span> { first: self.second, second: self.first }
-    }
-}
-
-<span class="kw">let</span> pair = <span class="tp">Pair</span> { first: <span class="str">"hello"</span>, second: <span class="num">42</span> }
-<span class="kw">let</span> swapped = pair.swap()
-println(swapped.first)  <span class="cm">// 42</span>
-println(swapped.second) <span class="cm">// "hello"</span></code></pre>
+        <pre><code><span class="kw">let</span> p = Point { x: <span class="num">3.0</span>, y: <span class="num">4.0</span> }
+println(str_float(p.x))  <span class="cm">// field access</span>
+println(str_float(v.len()))   <span class="cm">// method call</span></code></pre>
 
         <div class="book-nav">
             <a href="control-flow.html">&larr; Control Flow</a>
-            <a href="index.html" class="next">Documentation Home &rarr;</a>
+            <a href="../book/" class="next">Book &rarr;</a>
         </div>
     </div>
 

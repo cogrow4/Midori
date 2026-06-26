@@ -9,20 +9,20 @@
 
 mi_str mi_str_lit(const char* s) {
     mi_int len = (mi_int)strlen(s);
-    char* data = (char*)malloc((size_t)len + 1);
+    char* data = mi_alloc(len + 1);
     memcpy(data, s, (size_t)len + 1);
     return (mi_str){ data, len, len };
 }
 
 mi_str mi_str_empty(void) {
-    char* data = (char*)malloc(1);
+    char* data = mi_alloc(1);
     data[0] = '\0';
     return (mi_str){ data, 0, 0 };
 }
 
 mi_str mi_str_new(const char* s) {
     mi_int len = (mi_int)strlen(s);
-    char* data = (char*)malloc((size_t)(len + 1));
+    char* data = mi_alloc((len + 1));
     memcpy(data, s, (size_t)(len + 1));
     return (mi_str){ data, len, len };
 }
@@ -32,12 +32,12 @@ mi_str mi_str_from(char* data, mi_int len, mi_int cap) {
 }
 
 void mi_str_free(mi_str* s) {
-    if (s->data) { free(s->data); s->data = NULL; }
+    if (s->data) { mi_free(s->data); s->data = NULL; }
     s->len = 0; s->cap = 0;
 }
 
 mi_str mi_str_clone(mi_str s) {
-    char* data = (char*)malloc((size_t)s.cap + 1);
+    char* data = mi_alloc(s.cap + 1);
     memcpy(data, s.data, (size_t)s.len);
     data[s.len] = '\0';
     return (mi_str){ data, s.len, s.cap };
@@ -58,7 +58,7 @@ mi_bool mi_str_ge(mi_str a, mi_str b) { return strcmp(a.data, b.data) >= 0; }
 
 mi_str mi_str_concat(mi_str a, mi_str b) {
     mi_int new_len = a.len + b.len;
-    char* data = (char*)malloc((size_t)new_len + 1);
+    char* data = mi_alloc(new_len + 1);
     memcpy(data, a.data, (size_t)a.len);
     memcpy(data + a.len, b.data, (size_t)b.len);
     data[new_len] = '\0';
@@ -73,12 +73,12 @@ mi_char mi_str_at(mi_str s, mi_int i) {
 /* === Array Implementation === */
 
 mi_array mi_array_new(mi_int elem_size, mi_int cap) {
-    void* data = malloc((size_t)(elem_size * cap));
+    void* data = mi_alloc((size_t)(elem_size * cap));
     return (mi_array){ data, 0, cap, elem_size };
 }
 
 void mi_array_free(mi_array* arr) {
-    if (arr->data) { free(arr->data); arr->data = NULL; }
+    if (arr->data) { mi_free(arr->data); arr->data = NULL; }
     arr->len = 0; arr->cap = 0;
 }
 
@@ -108,7 +108,7 @@ void mi_array_push(mi_array* arr, void* val) {
 }
 
 mi_array mi_array_from_lit(void* data, mi_int len, mi_int elem_size) {
-    void* new_data = malloc((size_t)(elem_size * len));
+    void* new_data = mi_alloc((size_t)(elem_size * len));
     memcpy(new_data, data, (size_t)(elem_size * len));
     return (mi_array){ new_data, len, len, elem_size };
 }
@@ -199,7 +199,7 @@ mi_str mi_read_file(mi_str path) {
     fseek(f, 0, SEEK_END);
     long len = ftell(f);
     rewind(f);
-    char* data = (char*)malloc((size_t)len + 1);
+    char* data = mi_alloc(len + 1);
     size_t nread = fread(data, 1, (size_t)len, f);
     fclose(f);
     data[nread] = '\0';
@@ -229,8 +229,8 @@ struct mi_arena {
 };
 
 mi_arena* mi_arena_new(void) {
-    mi_arena* a = (mi_arena*)malloc(sizeof(mi_arena));
-    a->blocks = (void**)malloc(sizeof(void*) * 64);
+    mi_arena* a = (mi_arena*)mi_alloc(sizeof(mi_arena));
+    a->blocks = (void**)mi_alloc(sizeof(void*) * 64);
     a->count = 0;
     a->cap = 64;
     return a;
@@ -241,22 +241,22 @@ void* mi_arena_alloc(mi_arena* a, mi_int size) {
         a->cap *= 2;
         a->blocks = (void**)realloc(a->blocks, sizeof(void*) * (size_t)a->cap);
     }
-    void* ptr = malloc((size_t)size);
+    void* ptr = mi_alloc((size_t)size);
     a->blocks[a->count++] = ptr;
     return ptr;
 }
 
 void mi_arena_free_all(mi_arena* a) {
     for (mi_int i = 0; i < a->count; i++) {
-        free(a->blocks[i]);
+        mi_free(a->blocks[i]);
     }
     a->count = 0;
 }
 
 void mi_arena_free(mi_arena* a) {
     mi_arena_free_all(a);
-    free(a->blocks);
-    free(a);
+    mi_free(a->blocks);
+    mi_free(a);
 }
 
 /* === STRING BUILDER === */
@@ -270,25 +270,25 @@ mi_str_builder mi_sb_new(void) {
 void mi_sb_append(mi_str_builder* sb, mi_str s) {
     mi_str old = sb->buf;
     sb->buf = mi_str_concat(old, s);
-    free(old.data);
+    mi_free(old.data);
 }
 
 void mi_sb_append_cstr(mi_str_builder* sb, const char* s) {
     mi_str tmp = mi_str_lit(s);
     mi_sb_append(sb, tmp);
-    free(tmp.data);
+    mi_free(tmp.data);
 }
 
 void mi_sb_append_int(mi_str_builder* sb, mi_int n) {
     mi_str tmp = mi_to_string(n);
     mi_sb_append(sb, tmp);
-    free(tmp.data);
+    mi_free(tmp.data);
 }
 
 void mi_sb_append_float(mi_str_builder* sb, mi_float f) {
     mi_str tmp = mi_float_to_string(f);
     mi_sb_append(sb, tmp);
-    free(tmp.data);
+    mi_free(tmp.data);
 }
 
 mi_str mi_sb_build(mi_str_builder* sb) {
@@ -297,7 +297,7 @@ mi_str mi_sb_build(mi_str_builder* sb) {
 }
 
 void mi_sb_free(mi_str_builder* sb) {
-    free(sb->buf.data);
+    mi_free(sb->buf.data);
     sb->buf.data = NULL;
     sb->buf.len = 0;
     sb->buf.cap = 0;

@@ -40,13 +40,16 @@ impl Codegen {
         let mut out = String::new();
         out.push_str("#include \"midori_runtime.h\"\n\n");
 
-        // Emit struct definitions
-        for (name, fields) in &self.struct_types {
-            out.push_str(&format!("typedef struct {{\n"));
-            for (fname, ftype) in fields {
-                out.push_str(&format!("    {} {};\n", ftype, fname));
+        // Emit struct definitions in dependency order (topological sort)
+        let struct_order = self.sorted_structs();
+        for name in &struct_order {
+            if let Some(fields) = self.struct_types.get(name) {
+                out.push_str(&format!("typedef struct {{\n"));
+                for (fname, ftype) in fields {
+                    out.push_str(&format!("    {} {};\n", ftype, fname));
+                }
+                out.push_str(&format!("}} {};\n\n", name));
             }
-            out.push_str(&format!("}} {};\n\n", name));
         }
 
         // Emit enum definitions
@@ -96,6 +99,52 @@ impl Codegen {
         }
 
         self.output.clone()
+    }
+
+    /// Topological sort of structs by dependency.
+    /// Struct A depends on B if any field type of A is a known struct name.
+    /// Result: dependencies before dependents (Kahn's algorithm).
+    fn sorted_structs(&self) -> Vec<String> {
+        // deps[A] = structs A depends on (must be defined first)
+        let mut deps: HashMap<&str, Vec<&str>> = HashMap::new();
+        let mut dependents: HashMap<&str, Vec<&str>> = HashMap::new();
+        for name in self.struct_types.keys() {
+            deps.entry(name.as_str()).or_default();
+            dependents.entry(name.as_str()).or_default();
+        }
+        for (name, fields) in &self.struct_types {
+            for (_, ft) in fields {
+                let ft = ft.trim();
+                if self.struct_types.contains_key(ft) && ft != name {
+                    deps.get_mut(name.as_str()).unwrap().push(ft);
+                    dependents.get_mut(ft).unwrap().push(name.as_str());
+                }
+            }
+        }
+        // Kahn's: nodes with in_degree 0 have no pending deps, emit first
+        let mut in_degree: HashMap<&str, usize> = deps.iter()
+            .map(|(n, d)| (*n, d.len()))
+            .collect();
+        let mut queue: Vec<&str> = in_degree.iter()
+            .filter(|(_, &deg)| deg == 0)
+            .map(|(n, _)| *n)
+            .collect();
+        let mut sorted = Vec::new();
+        while let Some(n) = queue.pop() {
+            sorted.push(n.to_string());
+            for m in &dependents[n] {
+                let deg = in_degree.get_mut(m).unwrap();
+                *deg = deg.saturating_sub(1);
+                if *deg == 0 {
+                    queue.push(m);
+                }
+            }
+        }
+        if sorted.len() != self.struct_types.len() {
+            // ponytail: cycle detected, fallback to arbitrary order
+            return self.struct_types.keys().cloned().collect();
+        }
+        sorted
     }
 
     fn collect_types(&mut self, program: &Program) {

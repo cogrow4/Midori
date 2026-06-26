@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Reference — Midori</title>
+    <link rel="stylesheet" href="../styles/midori.css">
+</head>
+<body>
+    <nav>
+        <a href="/" class="logo">
+            <svg class="logo-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="leaf" d="M16 4C12 4 6 8 6 16C6 24 10 28 16 28C18 28 20 27 22 25C20 24 18 22 17 19C16 16 17 12 20 9C22 7 24 5 26 4C24 3 20 2 16 4Z"/>
+                <path class="leaf-accent" d="M16 28C14 28 10 26 9 22C11 23 14 23 16 21C18 19 19 15 20 12C21 10 22 8 24 7C22 9 20 12 19 16C18 20 17 24 16 28Z"/>
+            </svg>
+            <span>midori</span>
+        </a>
+        <div class="nav-links">
+            <a href="../docs/">Docs</a>
+            <a href="../book/">Book</a>
+            <a href="https://github.com/cogrow4/Midori">GitHub</a>
+        </div>
+    </nav>
+
+    <div class="content">
+        <h1>API Reference</h1>
+        <p>Built-in functions and types available in every Midori program.</p>
+
+        <h2>Output</h2>
+
+        <div class="toc">
+            <h3>Functions</h3>
+            <ul>
+                <li><a href="#print"><code>print(s: Str) -> Nil</code></a></li>
+                <li><a href="#println"><code>println(s: Str) -> Nil</code></a></li>
+            </ul>
+        </div>
+
+        <h3 id="print"><code>print(s: Str) -> Nil</code></h3>
+        <p>Print a string to stdout without a trailing newline.</p>
+
+        <h3 id="println"><code>println(s: Str) -> Nil</code></h3>
+        <p>Print a string to stdout followed by a newline.</p>
+        <pre><code><span class="kw">fn</span> main() {
+    print(<span class="str">"hello"</span>)    <span class="cm">// no newline</span>
+    println(<span class="str">"world"</span>)  <span class="cm">// with newline</span>
+}
+<span class="cm">// Output: helloworld</span></code></pre>
+
+        <h2>Type Conversion</h2>
+
+        <h3><code>str(n: Int) -> Str</code></h3>
+        <p>Convert an integer to its string representation.</p>
+
+        <h3><code>str_float(f: Float) -> Str</code></h3>
+        <p>Convert a float to its string representation.</p>
+
+        <h3><code>str_bool(b: Bool) -> Str</code></h3>
+        <p>Convert a boolean to <code>"true"</code> or <code>"false"</code>.</p>
+
+        <h3><code>str_char(c: Char) -> Str</code></h3>
+        <p>Convert a character to a single-character string.</p>
+
+        <h3><code>int(s: Str) -> Int</code></h3>
+        <p>Parse a string as an integer. Returns 0 on invalid input.</p>
+        <pre><code><span class="kw">let</span> n = int(<span class="str">"42"</span>)     <span class="cm">// n is 42 (Int)</span>
+<span class="kw">let</span> s1 = str(n)        <span class="cm">// s1 is "42"</span>
+<span class="kw">let</span> s2 = str_float(<span class="num">3.14</span>)  <span class="cm">// s2 is "3.14"</span>
+<span class="kw">let</span> s3 = str_bool(<span class="kw">true</span>)   <span class="cm">// s3 is "true"</span></code></pre>
+
+        <h2>String Operations</h2>
+
+        <h3><code>len_str(s: Str) -> Int</code></h3>
+        <p>Return the length of a string in bytes.</p>
+
+        <h3><code>s.len() -> Int</code> (method)</h3>
+        <p>String method — returns the length in bytes.</p>
+
+        <h3><code>s.is_empty() -> Bool</code> (method)</h3>
+        <p>String method — returns true if the string length is 0.</p>
+        <pre><code><span class="kw">let</span> s = <span class="str">"hello"</span>
+<span class="kw">let</span> n = len_str(s)     <span class="cm">// 5</span>
+<span class="kw">let</span> n2 = s.len()       <span class="cm">// 5 (method dispatch)</span>
+<span class="kw">let</span> empty = s.is_empty()  <span class="cm">// false</span></code></pre>
+
+        <h3>String Indexing</h3>
+        <p>Access individual characters by index: <code>s[i]</code> returns a <code>Char</code> at byte position <code>i</code>.</p>
+        <pre><code><span class="kw">let</span> s = <span class="str">"hello"</span>
+<span class="kw">let</span> c = s[<span class="num">0</span>]  <span class="cm">// 'h'</span></code></pre>
+
+        <h3>String Concatenation</h3>
+        <p>Use <code>+</code> to concatenate strings:</p>
+        <pre><code><span class="kw">let</span> s = <span class="str">"hello"</span> <span class="op">+</span> <span class="str">" "</span> <span class="op">+</span> <span class="str">"world"</span>  <span class="cm">// "hello world"</span></code></pre>
+
+        <h3>String Interpolation</h3>
+        <p>Embed expressions inside strings with <code>{ }</code>:</p>
+        <pre><code><span class="kw">let</span> name = <span class="str">"Midori"</span>
+<span class="kw">let</span> year = <span class="num">2026</span>
+println(<span class="str">"Welcome to {name}, version {year}!"</span>)
+<span class="cm">// Output: Welcome to Midori, version 2026!</span></code></pre>
+
+        <h2>Array Operations</h2>
+
+        <h3><code>len(arr: Array) -> Int</code></h3>
+        <p>Return the number of elements in an array.</p>
+
+        <h3><code>arr.len() -> Int</code> (method)</h3>
+        <p>Array method — returns the number of elements.</p>
+
+        <h3><code>arr.is_empty() -> Bool</code> (method)</h3>
+        <p>Array method — returns true if the array has 0 elements.</p>
+        <pre><code><span class="kw">let</span> arr = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]
+<span class="kw">let</span> n = len(arr)     <span class="cm">// 3</span>
+<span class="kw">let</span> n2 = arr.len()   <span class="cm">// 3 (method dispatch)</span></code></pre>
+
+        <h2>Math</h2>
+        <p>All math functions operate on <code>Float</code> values:</p>
+
+        <table style="width:100%; border-collapse: collapse; margin: 1rem 0;">
+            <tr style="border-bottom: 1px solid var(--border);">
+                <th style="text-align: left; padding: 0.5rem;">Function</th>
+                <th style="text-align: left; padding: 0.5rem;">Returns</th>
+                <th style="text-align: left; padding: 0.5rem;">Description</th>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem;"><code>pi()</code></td>
+                <td style="padding: 0.5rem;">Float</td>
+                <td style="padding: 0.5rem;">Mathematical constant π</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem;"><code>e()</code></td>
+                <td style="padding: 0.5rem;">Float</td>
+                <td style="padding: 0.5rem;">Euler's number</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem;"><code>sin(x)</code></td>
+                <td style="padding: 0.5rem;">Float</td>
+                <td style="padding: 0.5rem;">Sine</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem;"><code>cos(x)</code></td>
+                <td style="padding: 0.5rem;">Float</td>
+                <td style="padding: 0.5rem;">Cosine</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem;"><code>tan(x)</code></td>
+                <td style="padding: 0.5rem;">Float</td>
+                <td style="padding: 0.5rem;">Tangent</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem;"><code>sqrt(x)</code></td>
+                <td style="padding: 0.5rem;">Float</td>
+                <td style="padding: 0.5rem;">Square root</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem;"><code>pow(x, y)</code></td>
+                <td style="padding: 0.5rem;">Float</td>
+                <td style="padding: 0.5rem;">x raised to y</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem;"><code>exp(x)</code></td>
+                <td style="padding: 0.5rem;">Float</td>
+                <td style="padding: 0.5rem;">e raised to x</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem;"><code>log(x)</code></td>
+                <td style="padding: 0.5rem;">Float</td>
+                <td style="padding: 0.5rem;">Natural logarithm</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem;"><code>log10(x)</code></td>
+                <td style="padding: 0.5rem;">Float</td>
+                <td style="padding: 0.5rem;">Base-10 logarithm</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem;"><code>abs(x)</code></td>
+                <td style="padding: 0.5rem;">Float</td>
+                <td style="padding: 0.5rem;">Absolute value</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem;"><code>floor(x)</code></td>
+                <td style="padding: 0.5rem;">Float</td>
+                <td style="padding: 0.5rem;">Round down</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem;"><code>ceil(x)</code></td>
+                <td style="padding: 0.5rem;">Float</td>
+                <td style="padding: 0.5rem;">Round up</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem;"><code>round(x)</code></td>
+                <td style="padding: 0.5rem;">Float</td>
+                <td style="padding: 0.5rem;">Round to nearest</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem;"><code>atan2(y, x)</code></td>
+                <td style="padding: 0.5rem;">Float</td>
+                <td style="padding: 0.5rem;">Arctangent of y/x</td>
+            </tr>
+        </table>
+
+        <h2>File I/O</h2>
+
+        <h3><code>read_file(path: Str) -> Str</code></h3>
+        <p>Read the entire contents of a file. Returns an empty string if the file doesn't exist.</p>
+
+        <h3><code>write_file(path: Str, content: Str) -> Bool</code></h3>
+        <p>Write a string to a file. Returns true on success, false on failure.</p>
+
+        <h3><code>file_exists(path: Str) -> Bool</code></h3>
+        <p>Returns true if a file exists at the given path.</p>
+        <pre><code><span class="kw">let</span> content = read_file(<span class="str">"test.txt"</span>)
+<span class="kw">let</span> ok = write_file(<span class="str">"output.txt"</span>, <span class="str">"hello"</span>)
+<span class="kw">let</span> exists = file_exists(<span class="str">"test.txt"</span>)</code></pre>
+
+        <h2>CLI Arguments</h2>
+
+        <h3><code>os_args() -> Array(Str)</code></h3>
+        <p>Returns an array of command-line arguments passed to the program. The first argument (<code>args[0]</code>) is the program name.</p>
+        <pre><code><span class="kw">let</span> args = os_args()
+<span class="kw">let</span> prog_name = args[<span class="num">0</span>]
+<span class="kw">for</span> arg <span class="kw">in</span> args {
+    println(arg)
+}</code></pre>
+
+        <h2>Ranges</h2>
+
+        <h3><code>range(n: Int) -> Array(Int)</code></h3>
+        <p>Create an array of integers from 0 to n-1.</p>
+
+        <h3><code>range(start: Int, end: Int) -> Array(Int)</code></h3>
+        <p>Create an array of integers from start to end-1.</p>
+        <pre><code><span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">5</span>) {
+    println(str(i))
+}
+<span class="cm">// Prints 0, 1, 2, 3, 4</span>
+
+<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">2</span>, <span class="num">5</span>) {
+    println(str(i))
+}
+<span class="cm">// Prints 2, 3, 4</span></code></pre>
+        <p>Note: <code>range</code> returns an Array, so it works with <code>for...in</code> loops and len().</p>
+
+        <h2>String Builder</h2>
+        <p>For efficient string construction:</p>
+
+        <h3><code>sb_new() -> StrBuilder</code></h3>
+        <p>Create a new string builder.</p>
+
+        <h3><code>sb_append(builder, s: Str) -> Nil</code></h3>
+        <p>Append a string to the builder.</p>
+
+        <h3><code>sb_build(builder) -> Str</code></h3>
+        <p>Build the final string from the builder contents.</p>
+        <pre><code><span class="kw">let</span> sb = sb_new()
+sb_append(sb, <span class="str">"hello"</span>)
+sb_append(sb, <span class="str">" "</span>)
+sb_append(sb, <span class="str">"world"</span>)
+<span class="kw">let</span> result = sb_build(sb)  <span class="cm">// "hello world"</span></code></pre>
+
+        <div class="book-nav">
+            <a href="structs.html">&larr; Structs &amp; Enums</a>
+            <a href="../book/" class="next">Book &rarr;</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>Midori is free and open source. <a href="https://github.com/cogrow4/Midori">Contributions welcome</a>.</p>
+        <p style="margin-top:0.5rem; font-size:0.8rem;">&copy; 2026 The Midori Contributors</p>
+    </footer>
+</body>
+</html>

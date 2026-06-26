@@ -24,95 +24,53 @@
 
     <div class="content">
         <h1>Types</h1>
-        <p>Midori is a strongly typed language with full type inference. You rarely need to write types explicitly — the compiler can infer them from context.</p>
+        <p>Midori is a statically typed language with type inference. Most of the time you don't need to write types — the compiler infers them.</p>
 
         <h2>Primitive Types</h2>
-
-        <h3>Int</h3>
-        <p>A 64-bit signed integer:</p>
-        <pre><code><span class="kw">let</span> a: <span class="tp">Int</span> = <span class="num">42</span>
-<span class="kw">let</span> b = <span class="num">-17</span>           <span class="cm">// inferred as Int</span>
-<span class="kw">let</span> hex = <span class="num">0xFF</span>        <span class="cm">// hexadecimal literal</span>
-<span class="kw">let</span> bin = <span class="num">0b1010</span>      <span class="cm">// binary literal</span></code></pre>
-
-        <h3>Float</h3>
-        <p>A 64-bit floating point number:</p>
-        <pre><code><span class="kw">let</span> pi: <span class="tp">Float</span> = <span class="num">3.14159</span>
-<span class="kw">let</span> e = <span class="num">2.71828</span>        <span class="cm">// inferred as Float</span>
-<span class="kw">let</span> sci = <span class="num">1.5e10</span>      <span class="cm">// scientific notation</span></code></pre>
-
-        <h3>Bool</h3>
-        <p>A boolean value, either <code>true</code> or <code>false</code>:</p>
-        <pre><code><span class="kw">let</span> is_ready: <span class="tp">Bool</span> = <span class="kw">true</span>
-<span class="kw">let</span> done = <span class="kw">false</span>        <span class="cm">// inferred as Bool</span></code></pre>
-
-        <h3>Str</h3>
-        <p>A UTF-8 string with interpolation support:</p>
-        <pre><code><span class="kw">let</span> name = <span class="str">"Midori"</span>
-<span class="kw">let</span> greeting = <span class="str">"Hello, {name}!"</span>  <span class="cm">// "Hello, Midori!"</span>
-
-<span class="cm">// Multi-line strings</span>
-<span class="kw">let</span> poem = <span class="str">"Roses are red,
-Violets are blue,
-Midori is fresh,
-And so are you."</span></code></pre>
-
-        <h3>Char</h3>
-        <p>A single Unicode character:</p>
-        <pre><code><span class="kw">let</span> letter: <span class="tp">Char</span> = <span class="str">'A'</span>
-<span class="kw">let</span> emoji = <span class="str">'🍃'</span></code></pre>
-
-        <h2>Generic Types</h2>
-
-        <h3>Option[T]</h3>
-        <p>Represents a value that may or may not be present. Eliminates null pointer exceptions:</p>
-        <pre><code><span class="kw">let</span> some_value: <span class="tp">Option</span>[<span class="tp">Int</span>] = <span class="tp">Some</span>(<span class="num">42</span>)
-<span class="kw">let</span> no_value: <span class="tp">Option</span>[<span class="tp">Int</span>] = <span class="tp">None</span>
-
-<span class="cm">// Pattern matching on Option</span>
-<span class="kw">match</span> some_value {
-    <span class="tp">Some</span>(val) => println(<span class="str">"Got {val}"</span>),
-    <span class="tp">None</span> => println(<span class="str">"No value"</span>),
-}</code></pre>
-
-        <h3>Result[T, E]</h3>
-        <p>Represents either a success value or an error. Enforces error handling at the type level:</p>
-        <pre><code><span class="kw">fn</span> divide(a: <span class="tp">Int</span>, b: <span class="tp">Int</span>) -> <span class="tp">Result</span>[<span class="tp">Int</span>, <span class="tp">Str</span>] {
-    <span class="kw">if</span> b <span class="op">==</span> <span class="num">0</span> {
-        <span class="tp">Err</span>(<span class="str">"division by zero"</span>)
-    } <span class="kw">else</span> {
-        <span class="tp">Ok</span>(a <span class="op">/</span> b)
-    }
-}
-
-<span class="kw">let</span> result = divide(<span class="num">10</span>, <span class="num">2</span>)
-<span class="kw">match</span> result {
-    <span class="tp">Ok</span>(val) => println(<span class="str">"Result: {val}"</span>),
-    <span class="tp">Err</span>(msg) => println(<span class="str">"Error: {msg}"</span>),
-}</code></pre>
-
-        <h2>Type Annotations</h2>
-        <p>While Midori infers types, you can annotate them explicitly for clarity or when the compiler needs help:</p>
-        <pre><code><span class="kw">fn</span> add(x: <span class="tp">Int</span>, y: <span class="tp">Int</span>) -> <span class="tp">Int</span> {
-    x <span class="op">+</span> y
-}
-
-<span class="kw">let</span> items: <span class="tp">List</span>[<span class="tp">Str</span>] = <span class="tp">List</span>.new()
-<span class="kw">let</span> pair: (<span class="tp">Str</span>, <span class="tp">Int</span>) = (<span class="str">"age"</span>, <span class="num">30</span>)</code></pre>
+        <pre><code><span class="kw">let</span> count: <span class="tp">Int</span> = <span class="num">42</span>              <span class="cm">// 64-bit signed integer</span>
+<span class="kw">let</span> pi: <span class="tp">Float</span> = <span class="num">3.14</span>              <span class="cm">// 64-bit floating point</span>
+<span class="kw">let</span> is_active: <span class="tp">Bool</span> = <span class="kw">true</span>     <span class="cm">// boolean (true/false)</span>
+<span class="kw">let</span> msg: <span class="tp">Str</span> = <span class="str">"hello"</span>           <span class="cm">// string</span>
+<span class="kw">let</span> ch: <span class="tp">Char</span> = <span class="str">'A'</span>                <span class="cm">// ASCII character</span></code></pre>
 
         <h2>Type Inference</h2>
-        <p>The compiler deduces types from how values are used:</p>
+        <p>Type annotations are optional — the compiler infers types from values:</p>
         <pre><code><span class="kw">let</span> x = <span class="num">42</span>               <span class="cm">// x is Int</span>
-<span class="kw">let</span> y = <span class="num">3.14</span>              <span class="cm">// y is Float</span>
-<span class="kw">let</span> z = x <span class="op">+</span> to_int(y)      <span class="cm">// z is Int (y converted)</span>
+<span class="kw">let</span> y = <span class="str">"hello"</span>           <span class="cm">// y is Str</span>
+<span class="kw">let</span> z = <span class="num">3.14</span>              <span class="cm">// z is Float</span>
+<span class="kw">let</span> b = <span class="kw">true</span>               <span class="cm">// b is Bool</span></code></pre>
 
-<span class="cm">// Generic functions infer their type parameters</span>
-<span class="kw">fn</span> identity[T](val: <span class="tp">T</span>) -> <span class="tp">T</span> { val }
-<span class="kw">let</span> n = identity(<span class="num">42</span>)      <span class="cm">// n is Int</span>
-<span class="kw">let</span> s = identity(<span class="str">"hi"</span>)    <span class="cm">// s is Str</span></code></pre>
+        <h2>Function Types</h2>
+        <p>Functions have types too. A function that takes an Int and returns a Str has type <code>Fn(Int) -> Str</code>.</p>
+        <pre><code><span class="kw">fn</span> greet(n: <span class="tp">Int</span>) -> <span class="tp">Str</span> {
+    <span class="str">"Number: {n}"</span>
+}
+<span class="cm">// greet has type: Fn(Int) -> Str</span></code></pre>
 
-        <h2>Custom Types with <code>type</code></h2>
-        <p>Define your own types using the <code>type</code> keyword. See the <a href="structs.html">Custom Types</a> page for details.</p>
+        <h2>Custom Types</h2>
+        <p>Define structs and enums with the <code>type</code> keyword:</p>
+        <pre><code><span class="kw">type</span> Point {
+    x: <span class="tp">Float</span>
+    y: <span class="tp">Float</span>
+}
+
+<span class="kw">type</span> Color {
+    Red
+    Green
+    Blue
+}
+
+<span class="kw">type</span> Shape {
+    Circle { radius: <span class="tp">Float</span> }
+    Rect { width: <span class="tp">Float</span>, height: <span class="tp">Float</span> }
+}</code></pre>
+        <p>See the <a href="structs.html">Structs &amp; Enums</a> page for details on custom types and methods.</p>
+
+        <h2>Type Annotations</h2>
+        <p>Use <code>:</code> after the variable name to annotate a type:</p>
+        <pre><code><span class="kw">let</span> name: <span class="tp">Str</span> = <span class="str">"Midori"</span>
+<span class="kw">let</span> age: <span class="tp">Int</span> = <span class="num">1</span>
+<span class="kw">let</span> pi: <span class="tp">Float</span> = <span class="num">3.14159</span></code></pre>
 
         <div class="book-nav">
             <a href="syntax.html">&larr; Syntax</a>

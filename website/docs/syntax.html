@@ -87,24 +87,26 @@ y = y + <span class="num">5</span>
 println(greet(capitalize(<span class="str">"hello"</span>)))</code></pre>
 
         <h2>Ranges</h2>
-        <p>The <code>..</code> operator creates an inclusive range:</p>
+        <p>Use the built-in <code>range()</code> function to create a range of integers:</p>
 
-        <pre><code><span class="kw">let</span> range = <span class="num">0</span> <span class="op">..</span> <span class="num">10</span>  <span class="cm">// 0, 1, 2, ..., 10</span>
-
-<span class="kw">for</span> i <span class="kw">in</span> <span class="num">1</span> <span class="op">..</span> <span class="num">5</span> {
-    println(i)
+        <pre><code><span class="cm">// range(n) — 0 to n-1</span>
+<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">5</span>) {
+    println(str(i))
 }
-<span class="cm">// Prints 1, 2, 3, 4, 5</span></code></pre>
+<span class="cm">// Prints 0, 1, 2, 3, 4</span>
 
-        <h2>Semicolons and Newlines</h2>
-        <p>Semicolons are optional. Newlines act as statement separators:</p>
+<span class="cm">// range(start, end) — start to end-1</span>
+<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">1</span>, <span class="num">5</span>) {
+    println(str(i))
+}
+<span class="cm">// Prints 1, 2, 3, 4</span></code></pre>
+
+        <h2>Newlines as Separators</h2>
+        <p>Newlines separate statements. Each line is one statement:</p>
 
         <pre><code><span class="kw">let</span> a = <span class="num">1</span>
 <span class="kw">let</span> b = <span class="num">2</span>
-
-<span class="cm">// You can use semicolons to put multiple statements on one line</span>
-<span class="kw">let</span> x = <span class="num">1</span>; <span class="kw">let</span> y = <span class="num">2</span>; <span class="kw">let</span> z = <span class="num">3</span></code></pre>
-
+<span class="kw">let</span> c = a <span class="op">+</span> b</code></pre>
         <div class="book-nav">
             <a href="getting-started.html">&larr; Getting Started</a>
             <a href="types.html" class="next">Types &rarr;</a>

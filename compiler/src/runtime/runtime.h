@@ -23,6 +23,14 @@ typedef char     mi_char;
 typedef char mi_nil_t;
 #define mi_nil() ((mi_nil_t)0)
 
+/* --- Memory Allocation (swap arena in by changing these) --- */
+static inline void* mi_alloc(mi_int size) {
+    return malloc((size_t)size);
+}
+static inline void mi_free(void* ptr) {
+    if (ptr) free(ptr);
+}
+
 /* --- String Type --- */
 typedef struct {
     char* data;

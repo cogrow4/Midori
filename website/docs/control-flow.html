@@ -25,131 +25,100 @@
     <div class="content">
         <h1>Control Flow</h1>
 
-        <h2>If / Else</h2>
-        <p>Midori's <code>if</code> is an expression — it returns a value. No ternary operator needed:</p>
+        <h2>If / Elif / Else</h2>
+        <p>Conditional branching with <code>if</code>, <code>elif</code>, and <code>else</code>. Blocks are expressions — the last value is returned:</p>
 
-        <pre><code><span class="kw">let</span> x = <span class="num">10</span>
-
-<span class="kw">if</span> x <span class="op">&gt;</span> <span class="num">0</span> {
-    println(<span class="str">"positive"</span>)
-} <span class="kw">else</span> <span class="kw">if</span> x <span class="op">&lt;</span> <span class="num">0</span> {
-    println(<span class="str">"negative"</span>)
+        <pre><code><span class="kw">let</span> x = <span class="num">42</span>
+<span class="kw">if</span> x <span class="op">&gt;</span> <span class="num">100</span> {
+    println(<span class="str">"big"</span>)
+} <span class="kw">elif</span> x <span class="op">&gt;</span> <span class="num">10</span> {
+    println(<span class="str">"medium"</span>)
 } <span class="kw">else</span> {
-    println(<span class="str">"zero"</span>)
+    println(<span class="str">"small"</span>)
 }
 
-<span class="cm">// if as an expression</span>
-<span class="kw">let</span> result = <span class="kw">if</span> x <span class="op">&gt;</span> <span class="num">5</span> { <span class="str">"big"</span> } <span class="kw">else</span> { <span class="str">"small"</span> }
-println(result)  <span class="cm">// "big"</span></code></pre>
+<span class="cm">// If as an expression:</span>
+<span class="kw">let</span> label = <span class="kw">if</span> x <span class="op">&gt;</span> <span class="num">0</span> { <span class="str">"positive"</span> } <span class="kw">else</span> { <span class="str">"non-positive"</span> }</code></pre>
 
         <h2>Match</h2>
-        <p>Pattern matching with <code>match</code> is a powerful alternative to long if/else chains. Every arm is an expression:</p>
+        <p>Pattern matching with <code>match</code> — each arm uses <code>=&gt;</code> syntax:</p>
 
         <pre><code><span class="kw">match</span> x {
     <span class="num">0</span> => println(<span class="str">"zero"</span>),
     <span class="num">1</span> => println(<span class="str">"one"</span>),
-    <span class="num">2</span> <span class="op">..</span> <span class="num">10</span> => println(<span class="str">"between two and ten"</span>),
-    <span class="kw">_</span> => println(<span class="str">"something else"</span>),
+    <span class="kw">_</span> => println(<span class="str">"other"</span>),
 }
 
-<span class="cm">// Matching on enums</span>
-<span class="kw">type</span> <span class="tp">Color</span> {
-    <span class="tp">Red</span>,
-    <span class="tp">Green</span>,
-    <span class="tp">Blue</span>,
-    <span class="tp">Custom</span>(r: <span class="tp">Int</span>, g: <span class="tp">Int</span>, b: <span class="tp">Int</span>),
+<span class="cm">// Match as an expression:</span>
+<span class="kw">let</span> desc = <span class="kw">match</span> x {
+    <span class="num">0</span> => <span class="str">"none"</span>,
+    <span class="num">1</span> => <span class="str">"one"</span>,
+    <span class="kw">_</span> => <span class="str">"many"</span>,
 }
 
-<span class="kw">let</span> color = <span class="tp">Custom</span>(<span class="num">255</span>, <span class="num">0</span>, <span class="num">0</span>)
+<span class="cm">// Matching on enums:</span>
+<span class="kw">type</span> Color {
+    Red
+    Green
+    Blue
+}
+
 <span class="kw">match</span> color {
-    <span class="tp">Red</span> => println(<span class="str">"red"</span>),
-    <span class="tp">Custom</span>(r, g, b) => {
-        println(<span class="str">"rgb({r}, {g}, {b})"</span>)
-    },
-    <span class="kw">_</span> => println(<span class="str">"some color"</span>),
-}
-
-<span class="cm">// Matching on Option</span>
-<span class="kw">let</span> value: <span class="tp">Option</span>[<span class="tp">Int</span>] = <span class="tp">Some</span>(<span class="num">42</span>)
-<span class="kw">let</span> description = <span class="kw">match</span> value {
-    <span class="tp">Some</span>(n) <span class="kw">if</span> n <span class="op">&gt;</span> <span class="num">100</span> => <span class="str">"large"</span>,
-    <span class="tp">Some</span>(n) => <span class="str">"number {n}"</span>,
-    <span class="tp">None</span> => <span class="str">"nothing"</span>,
+    Color::Red => println(<span class="str">"red"</span>),
+    Color::Green => println(<span class="str">"green"</span>),
+    <span class="kw">_</span> => println(<span class="str">"other"</span>),
 }</code></pre>
 
         <h2>For Loops</h2>
-        <p>Iterate over ranges, collections, and iterators:</p>
+        <p>Iterate over ranges and arrays with <code>for...in</code>:</p>
 
-        <pre><code><span class="cm">// For loop with a range</span>
-<span class="kw">for</span> i <span class="kw">in</span> <span class="num">0</span> <span class="op">..</span> <span class="num">5</span> {
-    println(i)
+        <pre><code><span class="cm">// Range from 0 to 4</span>
+<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">5</span>) {
+    println(str(i))
 }
-<span class="cm">// Prints 0, 1, 2, 3, 4, 5</span>
+<span class="cm">// Prints 0, 1, 2, 3, 4</span>
 
-<span class="cm">// Iterating over a list</span>
+<span class="cm">// Range with start and end (exclusive)</span>
+<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">2</span>, <span class="num">5</span>) {
+    println(str(i))
+}
+<span class="cm">// Prints 2, 3, 4</span>
+
+<span class="cm">// Iterate over array</span>
 <span class="kw">let</span> names = [<span class="str">"Alice"</span>, <span class="str">"Bob"</span>, <span class="str">"Charlie"</span>]
 <span class="kw">for</span> name <span class="kw">in</span> names {
     println(name)
-}
-
-<span class="cm">// With index (destructuring)</span>
-<span class="kw">for</span> (i, name) <span class="kw">in</span> names.enumerate() {
-    println(<span class="str">"{i}: {name}"</span>)
 }</code></pre>
 
         <h2>While Loops</h2>
         <p>Loop while a condition holds:</p>
 
-        <pre><code><span class="kw">let</span> <span class="kw">mut</span> i = <span class="num">0</span>
+        <pre><code><span class="kw">var</span> i = <span class="num">0</span>
 <span class="kw">while</span> i <span class="op">&lt;</span> <span class="num">5</span> {
-    println(i)
+    println(str(i))
     i = i <span class="op">+</span> <span class="num">1</span>
 }
 <span class="cm">// Prints 0, 1, 2, 3, 4</span></code></pre>
 
-        <h2>Loop (Infinite)</h2>
-        <p>The <code>loop</code> keyword creates an infinite loop, useful with <code>break</code> for game loops or event-driven code:</p>
+        <h2>Loop / Break / Continue</h2>
+        <p><code>loop</code> creates an infinite loop. Use <code>break</code> to exit and <code>continue</code> to skip to the next iteration:</p>
 
-        <pre><code><span class="kw">let</span> <span class="kw">mut</span> counter = <span class="num">0</span>
+        <pre><code><span class="kw">var</span> i = <span class="num">0</span>
 <span class="kw">loop</span> {
-    println(counter)
-    counter = counter <span class="op">+</span> <span class="num">1</span>
-    <span class="kw">if</span> counter <span class="op">&gt;=</span> <span class="num">3</span> {
-        <span class="kw">break</span>
-    }
-}
-<span class="cm">// Prints 0, 1, 2</span></code></pre>
-
-        <h2>Break and Continue</h2>
-        <p>Control the flow inside loops:</p>
-
-        <pre><code><span class="cm">// break — exit the loop early</span>
-<span class="kw">for</span> i <span class="kw">in</span> <span class="num">0</span> <span class="op">..</span> <span class="num">100</span> {
-    <span class="kw">if</span> i <span class="op">*</span> i <span class="op">&gt;</span> <span class="num">50</span> {
-        <span class="kw">break</span>
-    }
-    println(i)
-}
-
-<span class="cm">// continue — skip to the next iteration</span>
-<span class="kw">for</span> i <span class="kw">in</span> <span class="num">0</span> <span class="op">..</span> <span class="num">10</span> {
-    <span class="kw">if</span> i <span class="op">%</span> <span class="num">2</span> <span class="op">==</span> <span class="num">0</span> {
+    i = i <span class="op">+</span> <span class="num">1</span>
+    <span class="kw">if</span> i <span class="op">%</span> <span class="num">2</span> == <span class="num">0</span> {
         <span class="kw">continue</span>
     }
-    println(i)  <span class="cm">// prints odd numbers only</span>
-}
-
-<span class="cm">// loop can return a value with break</span>
-<span class="kw">let</span> found = <span class="kw">loop</span> {
-    <span class="kw">let</span> input = read_line()
-    <span class="kw">if</span> input <span class="op">==</span> <span class="str">"quit"</span> {
-        <span class="kw">break</span> <span class="str">"goodbye"</span>
+    <span class="kw">if</span> i <span class="op">&gt;</span> <span class="num">5</span> {
+        <span class="kw">break</span>
     }
-}</code></pre>
+    println(str(i))
+}
+<span class="cm">// Prints 1, 3, 5</span></code></pre>
 
         <div class="book-nav">
             <a href="functions.html">&larr; Functions</a>
-            <a href="structs.html" class="next">Custom Types &rarr;</a>
+            <a href="structs.html" class="next">Structs &amp; Enums &rarr;</a>
         </div>
     </div>
 
